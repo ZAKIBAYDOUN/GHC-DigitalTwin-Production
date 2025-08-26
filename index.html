@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 Green Hill Canarias - Digital Twin Dashboard</title>
+    <meta name="description" content="AI-powered Digital Twin dashboard for sustainable agriculture and business intelligence">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .agent-card { 
+            transition: all 0.3s ease; 
+            cursor: pointer;
+        }
+        .agent-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .agent-card.selected {
+            ring: 2px solid #3B82F6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+        .typing-indicator {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 min-h-screen">
+    
+    <!-- Header -->
+    <header class="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-3xl">🌿</div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Green Hill Canarias</h1>
+                        <p class="text-sm text-gray-600">Digital Twin Dashboard</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div id="connectionStatus" class="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
+                        <i class="fas fa-circle-notch fa-spin mr-2"></i>Connecting...
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        Mode: <span id="systemMode" class="font-semibold">Static Demo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-8">
+        
+        <!-- Welcome Message -->
+        <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-2xl p-8 mb-8 text-center">
+            <h2 class="text-3xl font-bold mb-4">🤖 AI Executive Team Dashboard</h2>
+            <p class="text-xl opacity-90">Consult with 10 specialized AI agents for strategic insights</p>
+        </div>
+
+        <!-- Agent Selection -->
+        <div class="mb-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Select Your AI Executive</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="agentGrid">
+                <!-- Agents populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Main Interface -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Chat Interface -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-comments mr-2"></i>Executive Consultation
+                        </h3>
+                        <div class="text-sm text-gray-600">
+                            Agent: <span id="selectedAgentName" class="font-semibold text-blue-600">None Selected</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Messages -->
+                    <div id="messageArea" class="bg-gray-50 rounded-xl p-6 h-96 overflow-y-auto mb-4">
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">🌿</div>
+                            <p class="text-gray-500 text-lg">Select an AI executive above to begin your consultation</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Input -->
+                    <div class="flex gap-3">
+                        <input 
+                            type="text" 
+                            id="messageInput" 
+                            placeholder="Ask your strategic question..." 
+                            class="flex-1 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                            onkeypress="handleKeyPress(event)"
+                            disabled
+                        >
+                        <button 
+                            onclick="sendMessage()" 
+                            class="bg-gradient-to-r from-blue-600 to-green-600 text-white px-8 py-4 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
+                            id="sendBtn" 
+                            disabled
+                        >
+                            <i class="fas fa-paper-plane mr-2"></i>Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="space-y-6">
+                
+                <!-- System Status -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-server mr-2"></i>System Status
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Agents Available</span>
+                            <span class="font-semibold text-green-600">10/10</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Knowledge Domains</span>
+                            <span class="font-semibold text-green-600">7</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Status</span>
+                            <span class="font-semibold text-green-600" id="systemStatus">Ready</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-bolt mr-2"></i>Quick Actions
+                    </h3>
+                    <div class="space-y-2" id="quickActions">
+                        <button onclick="askQuestion('What is our current strategic position?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+                            📊 Strategic Overview
+                        </button>
+                        <button onclick="askQuestion('How are we performing financially?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+                            💰 Financial Health
+                        </button>
+                        <button onclick="askQuestion('What are our sustainability metrics?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+                            🌱 Sustainability Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- About -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-info-circle mr-2"></i>About
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        This Digital Twin dashboard provides access to 10 specialized AI agents, each expert in different aspects of Green Hill Canarias operations.
+                    </p>
+                    <div class="flex space-x-2">
+                        <a href="https://github.com/ZAKIBAYDOUN/GHC-DT" class="flex-1 bg-gray-800 text-white text-center py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                            <i class="fab fa-github mr-2"></i>GitHub
+                        </a>
+                        <button onclick="toggleDemo()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-play mr-2"></i>Demo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Agent Configuration
+        const agents = {
+            ceo_digital_twin: {
+                name: "CEO Digital Twin",
+                icon: "👑", 
+                color: "from-purple-600 to-indigo-600",
+                description: "Strategic vision & leadership"
+            },
+            cfo_agent: {
+                name: "CFO Agent",
+                icon: "💰",
+                color: "from-green-600 to-emerald-600", 
+                description: "Financial analysis & planning"
+            },
+            coo_agent: {
+                name: "COO Agent",
+                icon: "⚙️",
+                color: "from-blue-600 to-cyan-600",
+                description: "Operations & efficiency"
+            },
+            cmo_agent: {
+                name: "CMO Agent", 
+                icon: "📈",
+                color: "from-pink-600 to-rose-600",
+                description: "Marketing & growth"
+            },
+            agricultural_intelligence: {
+                name: "Agricultural AI",
+                icon: "🌱",
+                color: "from-green-500 to-lime-600",
+                description: "Farming intelligence"
+            },
+            sustainability_agent: {
+                name: "Sustainability Agent",
+                icon: "♻️", 
+                color: "from-emerald-600 to-teal-600",
+                description: "ESG & environment"
+            },
+            risk_management: {
+                name: "Risk Agent",
+                icon: "🛡️",
+                color: "from-red-600 to-orange-600",
+                description: "Risk assessment"
+            },
+            compliance_agent: {
+                name: "Compliance Agent", 
+                icon: "⚖️",
+                color: "from-gray-600 to-slate-600",
+                description: "Regulatory compliance"
+            },
+            data_analytics: {
+                name: "Analytics Agent",
+                icon: "📊",
+                color: "from-indigo-600 to-purple-600", 
+                description: "Data insights"
+            },
+            customer_service: {
+                name: "Customer Agent",
+                icon: "🤝",
+                color: "from-amber-600 to-yellow-600",
+                description: "Customer relations"
+            }
+        };
+
+        let selectedAgent = null;
+        let isDemo = true;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAgents();
+            checkConnection();
+        });
+
+        function renderAgents() {
+            const grid = document.getElementById('agentGrid');
+            grid.innerHTML = '';
+
+            Object.entries(agents).forEach(([key, agent]) => {
+                const card = document.createElement('div');
+                card.className = `agent-card bg-gradient-to-br ${agent.color} text-white p-4 rounded-xl`;
+                card.onclick = () => selectAgent(key);
+                
+                card.innerHTML = `
+                    <div class="text-2xl mb-2">${agent.icon}</div>
+                    <div class="font-semibold text-sm mb-1">${agent.name}</div>
+                    <div class="text-xs opacity-90">${agent.description}</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function selectAgent(agentKey) {
+            selectedAgent = agentKey;
+            const agent = agents[agentKey];
+            
+            // Update UI
+            document.getElementById('selectedAgentName').textContent = agent.name;
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            
+            // Highlight selected agent
+            document.querySelectorAll('.agent-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.agent-card').classList.add('selected');
+            
+            // Clear and show welcome message
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `
+                <div class="text-center">
+                    <div class="text-4xl mb-3">${agent.icon}</div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">${agent.name}</h3>
+                    <p class="text-gray-600 mb-4">${agent.description}</p>
+                    <p class="text-sm text-gray-500">Ask me anything about Green Hill Canarias operations and strategy.</p>
+                </div>
+            `;
+        }
+
+        function askQuestion(question) {
+            if (!selectedAgent) {
+                alert('Please select an AI agent first');
+                return;
+            }
+            document.getElementById('messageInput').value = question;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || !selectedAgent) return;
+
+            // Add user message
+            addMessage('user', message);
+            input.value = '';
+            
+            // Show typing indicator
+            addTypingIndicator();
+            
+            // Simulate AI response
+            setTimeout(() => {
+                removeTypingIndicator();
+                const agent = agents[selectedAgent];
+                const response = generateResponse(agent, message);
+                addMessage('agent', response, agent);
+            }, 1500 + Math.random() * 1500);
+        }
+
+        function addMessage(type, content, agent = null) {
+            const messageArea = document.getElementById('messageArea');
+            
+            // Clear welcome message if this is first interaction
+            if (messageArea.innerHTML.includes('Select an AI executive')) {
+                messageArea.innerHTML = '';
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `mb-4 ${type === 'user' ? 'text-right' : 'text-left'}`;
+            
+            if (type === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="inline-block bg-blue-600 text-white px-4 py-3 rounded-2xl max-w-md">
+                        <div class="font-medium text-sm mb-1">👤 You</div>
+                        <div>${content}</div>
+                    </div>
+                `;
+            } else if (type === 'agent') {
+                messageDiv.innerHTML = `
+                    <div class="inline-block bg-white border border-gray-200 px-4 py-3 rounded-2xl max-w-md">
+                        <div class="font-medium text-sm mb-2 text-gray-800">${agent.icon} ${agent.name}</div>
+                        <div class="text-gray-700">${content}</div>
+                    </div>
+                `;
+            }
+            
+            messageArea.appendChild(messageDiv);
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        function addTypingIndicator() {
+            const messageArea = document.getElementById('messageArea');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'mb-4 text-left';
+            typingDiv.innerHTML = `
+                <div class="inline-block bg-gray-200 px-4 py-3 rounded-2xl">
+                    <div class="typing-indicator text-gray-600">
+                        <i class="fas fa-circle text-xs"></i>
+                        <i class="fas fa-circle text-xs mx-1"></i>
+                        <i class="fas fa-circle text-xs"></i>
+                        Thinking...
+                    </div>
+                </div>
+            `;
+            messageArea.appendChild(typingDiv);
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) indicator.remove();
+        }
+
+        function generateResponse(agent, question) {
+            const responses = {
+                ceo_digital_twin: [
+                    "From a strategic perspective, we need to focus on sustainable growth while maintaining our competitive edge in precision agriculture.",
+                    "Our vision is to become the leading sustainable agriculture platform in the region, leveraging AI and IoT technologies.",
+                    "This requires careful analysis of market opportunities and alignment with our core values of sustainability and innovation."
+                ],
+                cfo_agent: [
+                    "Looking at our financial metrics, we're seeing strong growth in revenue with improving margins.",
+                    "Our current burn rate is sustainable, but we should consider strategic investments in technology infrastructure.",
+                    "The ROI on our precision agriculture initiatives is exceeding projections by 15%."
+                ],
+                agricultural_intelligence: [
+                    "Our crop monitoring systems indicate optimal growing conditions with 23% improved yield efficiency.",
+                    "Weather patterns suggest we should adjust irrigation schedules for the next growing cycle.",
+                    "Soil health metrics are showing positive trends following our regenerative agriculture implementation."
+                ]
+            };
+            
+            const agentResponses = responses[selectedAgent] || responses.ceo_digital_twin;
+            const baseResponse = agentResponses[Math.floor(Math.random() * agentResponses.length)];
+            
+            return `${baseResponse}\n\nRegarding "${question}" - this aligns with our strategic priorities and requires data-driven decision making for optimal outcomes.`;
+        }
+
+        function checkConnection() {
+            // Try to detect if we can connect to local server
+            fetch('http://localhost:8000/api/system/health')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('connectionStatus').innerHTML = 
+                        '<i class="fas fa-check-circle text-green-600 mr-2"></i>Local Server';
+                    document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-green-100 text-green-800';
+                    document.getElementById('systemMode').textContent = 'Live System';
+                    isDemo = false;
+                })
+                .catch(() => {
+                    document.getElementById('connectionStatus').innerHTML = 
+                        '<i class="fas fa-globe text-blue-600 mr-2"></i>Demo Mode';
+                    document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800';
+                    document.getElementById('systemMode').textContent = 'Static Demo';
+                    isDemo = true;
+                });
+        }
+
+        function toggleDemo() {
+            if (isDemo) {
+                alert('🚀 This is a demo version!\n\nFor the full experience:\n1. Run locally: start_system.bat\n2. Visit: http://localhost:8000\n3. Full 10-agent system with real AI');
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>

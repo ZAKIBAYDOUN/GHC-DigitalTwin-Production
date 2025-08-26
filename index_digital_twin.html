@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>?? Green Hill Canarias - Digital Twin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .agent-card { transition: all 0.3s ease; }
+        .agent-card:hover { transform: translateY(-2px); }
+        .collaboration-indicator { 
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 min-h-screen">
+    
+    <!-- Header -->
+    <header class="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-3xl">??</div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Green Hill Canarias</h1>
+                        <p class="text-sm text-gray-600">Digital Twin Startup Dashboard</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div id="systemStatus" class="px-3 py-1 rounded-full text-sm">
+                        <i class="fas fa-circle-notch fa-spin mr-2"></i>Initializing...
+                    </div>
+                    <button id="collaborationToggle" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-users mr-2"></i>Enable Collaboration
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-8">
+        
+        <!-- Agent Selection Grid -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">?? Select Your AI Executive Team</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="agentGrid">
+                <!-- Agents will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Chat Interface -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-comments mr-2"></i>Executive Consultation
+                        </h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-600">Agent:</span>
+                            <span id="currentAgent" class="font-semibold text-blue-600">CEO Digital Twin</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Messages -->
+                    <div id="messages" class="bg-gray-50 rounded-xl p-4 h-96 overflow-y-auto mb-4">
+                        <div class="text-center text-gray-500">
+                            <div class="text-6xl mb-4">??</div>
+                            <p>Select an AI executive and start your strategic consultation...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Input Area -->
+                    <div class="space-y-4">
+                        <div class="flex gap-3">
+                            <input 
+                                type="text" 
+                                id="messageInput" 
+                                placeholder="Ask your question..." 
+                                class="flex-1 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                onkeypress="handleKeyPress(event)"
+                                disabled
+                            >
+                            <button 
+                                onclick="sendMessage()" 
+                                class="bg-gradient-to-r from-blue-600 to-green-600 text-white px-8 py-4 rounded-xl hover:shadow-lg transition-all disabled:opacity-50" 
+                                id="sendButton" 
+                                disabled
+                            >
+                                <i class="fas fa-paper-plane mr-2"></i>Send
+                            </button>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="flex gap-2 flex-wrap" id="quickActions">
+                            <!-- Populated dynamically based on selected agent -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Panels -->
+            <div class="space-y-6">
+                
+                <!-- Knowledge Status -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-database mr-2"></i>Knowledge Base Status
+                    </h3>
+                    <div id="knowledgeStats" class="space-y-3">
+                        <div class="text-center text-gray-500">Loading...</div>
+                    </div>
+                </div>
+
+                <!-- Recent Actions -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-tasks mr-2"></i>Recommended Actions
+                    </h3>
+                    <div id="recommendedActions" class="space-y-2">
+                        <div class="text-center text-gray-500">No actions yet</div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-chart-line mr-2"></i>System Performance
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Response Time</span>
+                            <span class="font-semibold" id="responseTime">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Confidence</span>
+                            <span class="font-semibold" id="confidence">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Knowledge Sources</span>
+                            <span class="font-semibold" id="knowledgeSources">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Knowledge Ingestion Panel -->
+        <div class="mt-8">
+            <div class="bg-white rounded-2xl shadow-xl p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-brain mr-2"></i>Knowledge Management
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Document Content</label>
+                        <textarea 
+                            id="documentContent" 
+                            class="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            placeholder="Paste document content, financial reports, strategic plans..."
+                        ></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Source & Domain</label>
+                        <input 
+                            type="text" 
+                            id="documentSource" 
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 mb-3"
+                            placeholder="e.g., 'Q4 Financial Report'"
+                        >
+                        <select id="knowledgeDomain" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 mb-3">
+                            <option value="strategic">Strategic Planning</option>
+                            <option value="financial">Financial Data</option>
+                            <option value="operations">Operations</option>
+                            <option value="compliance">Compliance</option>
+                            <option value="market_intelligence">Market Intelligence</option>
+                            <option value="sustainability">Sustainability</option>
+                            <option value="customer_data">Customer Data</option>
+                        </select>
+                        <button onclick="ingestDocument()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors">
+                            <i class="fas fa-upload mr-2"></i>Add to Knowledge Base
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = "http://localhost:8000/api";
+        let currentAgentType = "ceo_digital_twin";
+        let collaborationEnabled = false;
+        let availableAgents = [];
+
+        // Agent definitions
+        const agentConfig = {
+            "ceo_digital_twin": {
+                name: "CEO Digital Twin",
+                icon: "??",
+                color: "from-purple-600 to-indigo-600",
+                description: "Strategic oversight & vision"
+            },
+            "cfo_agent": {
+                name: "CFO Agent", 
+                icon: "??",
+                color: "from-green-600 to-emerald-600",
+                description: "Financial analysis & planning"
+            },
+            "coo_agent": {
+                name: "COO Agent",
+                icon: "??", 
+                color: "from-blue-600 to-cyan-600",
+                description: "Operations optimization"
+            },
+            "cmo_agent": {
+                name: "CMO Agent",
+                icon: "??",
+                color: "from-pink-600 to-rose-600", 
+                description: "Marketing & growth"
+            },
+            "agricultural_intelligence": {
+                name: "Agricultural AI",
+                icon: "??",
+                color: "from-green-500 to-lime-600",
+                description: "Crop & farming intelligence"
+            },
+            "sustainability_agent": {
+                name: "Sustainability Agent",
+                icon: "??",
+                color: "from-emerald-600 to-teal-600",
+                description: "ESG & environmental metrics"
+            },
+            "risk_management": {
+                name: "Risk Management",
+                icon: "???",
+                color: "from-red-600 to-orange-600", 
+                description: "Risk assessment & mitigation"
+            },
+            "compliance_agent": {
+                name: "Compliance Agent",
+                icon: "??",
+                color: "from-gray-600 to-slate-600",
+                description: "Regulatory compliance"
+            },
+            "data_analytics": {
+                name: "Data Analytics",
+                icon: "??",
+                color: "from-indigo-600 to-purple-600",
+                description: "Advanced analytics & insights"
+            },
+            "customer_service": {
+                name: "Customer Service",
+                icon: "??",
+                color: "from-amber-600 to-yellow-600",
+                description: "Customer support & relations"
+            }
+        };
+
+        // Initialize system
+        document.addEventListener('DOMContentLoaded', function() {
+            checkSystemHealth();
+            loadAgents();
+            loadKnowledgeStats();
+        });
+
+        async function checkSystemHealth() {
+            const statusEl = document.getElementById('systemStatus');
+            try {
+                const response = await fetch(`${API_BASE}/system/health`);
+                const data = await response.json();
+                
+                statusEl.innerHTML = '<i class="fas fa-check-circle text-green-600 mr-2"></i>System Online';
+                statusEl.classList.add('bg-green-100', 'text-green-800');
+            } catch (error) {
+                statusEl.innerHTML = '<i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>System Offline';
+                statusEl.classList.add('bg-red-100', 'text-red-800');
+            }
+        }
+
+        async function loadAgents() {
+            try {
+                const response = await fetch(`${API_BASE}/agents`);
+                const data = await response.json();
+                availableAgents = data.agents;
+                renderAgentGrid();
+            } catch (error) {
+                console.error('Failed to load agents:', error);
+                renderAgentGrid(); // Render with default config
+            }
+        }
+
+        function renderAgentGrid() {
+            const grid = document.getElementById('agentGrid');
+            grid.innerHTML = '';
+
+            Object.entries(agentConfig).forEach(([type, config]) => {
+                const card = document.createElement('div');
+                card.className = `agent-card bg-gradient-to-br ${config.color} text-white p-4 rounded-xl cursor-pointer hover:shadow-lg`;
+                card.onclick = () => selectAgent(type);
+                
+                card.innerHTML = `
+                    <div class="text-2xl mb-2">${config.icon}</div>
+                    <div class="font-semibold text-sm mb-1">${config.name}</div>
+                    <div class="text-xs opacity-90">${config.description}</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function selectAgent(agentType) {
+            currentAgentType = agentType;
+            const config = agentConfig[agentType];
+            
+            document.getElementById('currentAgent').textContent = config.name;
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('sendButton').disabled = false;
+            
+            // Update quick actions based on agent
+            updateQuickActions(agentType);
+            
+            // Highlight selected agent
+            document.querySelectorAll('.agent-card').forEach(card => {
+                card.classList.remove('ring-4', 'ring-white', 'ring-opacity-60');
+            });
+            event.target.closest('.agent-card').classList.add('ring-4', 'ring-white', 'ring-opacity-60');
+        }
+
+        function updateQuickActions(agentType) {
+            const quickActions = document.getElementById('quickActions');
+            const actionMap = {
+                "ceo_digital_twin": ["Strategic Overview", "Growth Opportunities", "Market Analysis"],
+                "cfo_agent": ["Financial Health", "Budget Analysis", "Investment ROI"],
+                "coo_agent": ["Operational Efficiency", "Supply Chain", "Process Optimization"],
+                "agricultural_intelligence": ["Crop Status", "Weather Impact", "Yield Predictions"]
+            };
+
+            const actions = actionMap[agentType] || [];
+            quickActions.innerHTML = actions.map(action => 
+                `<button onclick="useQuickAction('${action}')" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm transition-colors">${action}</button>`
+            ).join('');
+        }
+
+        function useQuickAction(action) {
+            document.getElementById('messageInput').value = action;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const sendBtn = document.getElementById('sendButton');
+            sendBtn.disabled = true;
+            
+            // Add user message
+            addMessage('user', message);
+            input.value = '';
+
+            const startTime = performance.now();
+
+            try {
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        question: message,
+                        agent_type: currentAgentType,
+                        audience: "executive",
+                        language: "en",
+                        require_collaboration: collaborationEnabled
+                    })
+                });
+
+                const data = await response.json();
+                const responseTime = performance.now() - startTime;
+
+                // Add agent response
+                addMessage('assistant', data.response, data);
+                
+                // Update metrics
+                updateMetrics(data, responseTime);
+                
+                // Show recommended actions
+                showRecommendedActions(data.recommended_actions);
+
+            } catch (error) {
+                addMessage('system', `Error: ${error.message}`);
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+
+        function addMessage(sender, content, metadata = {}) {
+            const messagesDiv = document.getElementById('messages');
+            
+            if (messagesDiv.children.length === 1 && messagesDiv.children[0].textContent.includes('Select an AI executive')) {
+                messagesDiv.innerHTML = '';
+            }
+
+            const messageDiv = document.createElement('div');
+            const isUser = sender === 'user';
+            
+            messageDiv.className = `mb-4 ${isUser ? 'text-right' : 'text-left'}`;
+            
+            const bgColor = isUser ? 'bg-blue-600 text-white' : 
+                           sender === 'assistant' ? 'bg-white border border-gray-200' : 
+                           'bg-yellow-100 text-yellow-800';
+
+            let agentInfo = '';
+            if (sender === 'assistant' && metadata.agent_type) {
+                const config = agentConfig[metadata.agent_type];
+                agentInfo = `<div class="text-sm font-medium mb-2">${config.icon} ${config.name}</div>`;
+                
+                if (metadata.collaborating_agents && metadata.collaborating_agents.length > 0) {
+                    const collabNames = metadata.collaborating_agents.map(type => agentConfig[type]?.name || type).join(', ');
+                    agentInfo += `<div class="text-xs opacity-75 mb-2 collaboration-indicator">?? Collaborated with: ${collabNames}</div>`;
+                }
+            }
+
+            messageDiv.innerHTML = `
+                <div class="inline-block max-w-md px-4 py-3 rounded-2xl ${bgColor}">
+                    ${agentInfo}
+                    <div class="whitespace-pre-wrap">${content}</div>
+                    ${metadata.confidence ? `<div class="text-xs mt-2 opacity-75">Confidence: ${Math.round(metadata.confidence * 100)}%</div>` : ''}
+                </div>
+            `;
+
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function updateMetrics(data, responseTime) {
+            document.getElementById('responseTime').textContent = `${Math.round(responseTime)}ms`;
+            document.getElementById('confidence').textContent = `${Math.round((data.confidence || 0) * 100)}%`;
+            document.getElementById('knowledgeSources').textContent = data.knowledge_sources?.length || 0;
+        }
+
+        function showRecommendedActions(actions) {
+            const actionsDiv = document.getElementById('recommendedActions');
+            if (!actions || actions.length === 0) {
+                actionsDiv.innerHTML = '<div class="text-center text-gray-500">No actions recommended</div>';
+                return;
+            }
+
+            actionsDiv.innerHTML = actions.slice(0, 5).map(action => 
+                `<div class="flex items-center p-2 bg-gray-50 rounded-lg">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                    <span class="text-sm">${action}</span>
+                </div>`
+            ).join('');
+        }
+
+        async function loadKnowledgeStats() {
+            try {
+                const response = await fetch(`${API_BASE}/knowledge/stats`);
+                const data = await response.json();
+                
+                const statsDiv = document.getElementById('knowledgeStats');
+                const domains = Object.entries(data.domains);
+                
+                statsDiv.innerHTML = domains.map(([domain, info]) => {
+                    const statusColor = info.status === 'available' ? 'text-green-600' : 'text-gray-400';
+                    const icon = info.status === 'available' ? 'check-circle' : 'times-circle';
+                    
+                    return `
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm capitalize">${domain.replace('_', ' ')}</span>
+                            <i class="fas fa-${icon} ${statusColor}"></i>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                document.getElementById('knowledgeStats').innerHTML = 
+                    '<div class="text-center text-gray-500">Unable to load stats</div>';
+            }
+        }
+
+        async function ingestDocument() {
+            const content = document.getElementById('documentContent').value.trim();
+            const source = document.getElementById('documentSource').value.trim();
+            const domain = document.getElementById('knowledgeDomain').value;
+
+            if (!content || !source) {
+                alert('Please provide both content and source name.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/knowledge/ingest`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, source, domain })
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert(`? Successfully added "${source}" to ${domain} knowledge base!`);
+                    document.getElementById('documentContent').value = '';
+                    document.getElementById('documentSource').value = '';
+                    loadKnowledgeStats();
+                } else {
+                    throw new Error(result.message || 'Failed to ingest document');
+                }
+            } catch (error) {
+                alert(`? Failed to add document: ${error.message}`);
+            }
+        }
+
+        // Toggle collaboration
+        document.getElementById('collaborationToggle').onclick = function() {
+            collaborationEnabled = !collaborationEnabled;
+            this.innerHTML = collaborationEnabled ? 
+                '<i class="fas fa-users mr-2"></i>Collaboration ON' : 
+                '<i class="fas fa-user mr-2"></i>Collaboration OFF';
+            this.classList.toggle('bg-green-600');
+            this.classList.toggle('bg-blue-600');
+        };
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>

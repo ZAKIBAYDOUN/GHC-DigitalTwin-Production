@@ -1,0 +1,100 @@
+name: Deploy Digital Twin to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js (for any build tools)
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Create static build
+      run: |
+        # Ensure we have the main HTML file
+        if [ ! -f "index.html" ]; then
+          if [ -f "index_digital_twin.html" ]; then
+            cp index_digital_twin.html index.html
+          else
+            echo "Creating basic index.html"
+            cat > index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>?? Green Hill Canarias - Digital Twin</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
+            <div class="text-center">
+                <div class="text-6xl mb-4">??</div>
+                <h1 class="text-4xl font-bold text-green-800 mb-4">Green Hill Canarias</h1>
+                <h2 class="text-2xl text-gray-600 mb-6">Digital Twin - Coming Soon</h2>
+                <p class="text-lg text-gray-500 mb-8">Sophisticated AI-powered startup dashboard</p>
+                <a href="https://github.com/ZAKIBAYDOUN/GHC-DT" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                    View on GitHub
+                </a>
+            </div>
+        </body>
+        </html>
+        EOF
+          fi
+        fi
+        
+        # Create a basic 404 page
+        cat > 404.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>404 - GHC Digital Twin</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="bg-gray-100 min-h-screen flex items-center justify-center">
+            <div class="text-center">
+                <h1 class="text-6xl font-bold text-gray-800 mb-4">404</h1>
+                <p class="text-xl text-gray-600 mb-8">Page not found</p>
+                <a href="/" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                    Return Home
+                </a>
+            </div>
+        </body>
+        </html>
+        EOF
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
