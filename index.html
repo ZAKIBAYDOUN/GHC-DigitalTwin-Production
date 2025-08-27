@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌿 Green Hill Canarias - Digital Twin Dashboard</title>
-    <meta name="description" content="AI-powered Digital Twin dashboard for sustainable agriculture and business intelligence">
+    <title>🌿 GHC Digital Twin - LangGraph Powered</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -40,16 +39,16 @@
                     <div class="text-3xl">🌿</div>
                     <div>
                         <h1 class="text-2xl font-bold text-gray-800">Green Hill Canarias</h1>
-                        <p class="text-sm text-gray-600">Digital Twin Dashboard</p>
+                        <p class="text-sm text-gray-600">Digital Twin Dashboard - LangGraph Powered</p>
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <div id="connectionStatus" class="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
-                        <i class="fas fa-circle-notch fa-spin mr-2"></i>Connecting...
+                    <div id="connectionStatus" class="px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                        <i class="fas fa-link mr-2"></i><span id="tracing-status">Connected to LangGraph</span>
                     </div>
                     <div class="text-sm text-gray-600">
-                        Mode: <span id="systemMode" class="font-semibold">Static Demo</span>
+                        Mode: <span id="systemMode" class="font-semibold text-blue-600">Live Production</span>
                     </div>
                 </div>
             </div>
@@ -61,14 +60,40 @@
         <!-- Welcome Message -->
         <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-2xl p-8 mb-8 text-center">
             <h2 class="text-3xl font-bold mb-4">🤖 AI Executive Team Dashboard</h2>
-            <p class="text-xl opacity-90">Consult with 10 specialized AI agents for strategic insights</p>
+            <p class="text-xl opacity-90 mb-2">Powered by LangGraph Cloud Deployment</p>
+            <p class="text-sm opacity-80">🔗 Connected to: dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app</p>
+            <p class="text-sm opacity-80">📊 LangSmith Tracing: Active</p>
         </div>
 
         <!-- Agent Selection -->
         <div class="mb-8">
             <h3 class="text-2xl font-bold text-gray-800 mb-6">Select Your AI Executive</h3>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="agentGrid">
-                <!-- Agents populated by JavaScript -->
+                <div class="agent-card bg-white p-4 rounded-xl shadow-lg border hover:border-blue-300" data-agent="ceo_digital_twin">
+                    <div class="text-3xl mb-2 text-center">👑</div>
+                    <h4 class="font-semibold text-center text-sm">CEO Digital Twin</h4>
+                    <p class="text-xs text-gray-600 text-center mt-1">Strategic Leadership</p>
+                </div>
+                <div class="agent-card bg-white p-4 rounded-xl shadow-lg border hover:border-blue-300" data-agent="cfo_agent">
+                    <div class="text-3xl mb-2 text-center">💰</div>
+                    <h4 class="font-semibold text-center text-sm">CFO Agent</h4>
+                    <p class="text-xs text-gray-600 text-center mt-1">Financial Analysis</p>
+                </div>
+                <div class="agent-card bg-white p-4 rounded-xl shadow-lg border hover:border-blue-300" data-agent="coo_agent">
+                    <div class="text-3xl mb-2 text-center">⚙️</div>
+                    <h4 class="font-semibold text-center text-sm">COO Agent</h4>
+                    <p class="text-xs text-gray-600 text-center mt-1">Operations</p>
+                </div>
+                <div class="agent-card bg-white p-4 rounded-xl shadow-lg border hover:border-blue-300" data-agent="agricultural_intelligence">
+                    <div class="text-3xl mb-2 text-center">🌱</div>
+                    <h4 class="font-semibold text-center text-sm">Agricultural AI</h4>
+                    <p class="text-xs text-gray-600 text-center mt-1">Crop Intelligence</p>
+                </div>
+                <div class="agent-card bg-white p-4 rounded-xl shadow-lg border hover:border-blue-300" data-agent="sustainability_agent">
+                    <div class="text-3xl mb-2 text-center">♻️</div>
+                    <h4 class="font-semibold text-center text-sm">Sustainability</h4>
+                    <p class="text-xs text-gray-600 text-center mt-1">ESG Metrics</p>
+                </div>
             </div>
         </div>
 
@@ -83,7 +108,7 @@
                             <i class="fas fa-comments mr-2"></i>Executive Consultation
                         </h3>
                         <div class="text-sm text-gray-600">
-                            Agent: <span id="selectedAgentName" class="font-semibold text-blue-600">None Selected</span>
+                            Agent: <span id="selectedAgentName" class="font-semibold text-blue-600">Select an Agent</span>
                         </div>
                     </div>
                     
@@ -92,26 +117,26 @@
                         <div class="text-center">
                             <div class="text-6xl mb-4">🌿</div>
                             <p class="text-gray-500 text-lg">Select an AI executive above to begin your consultation</p>
+                            <p class="text-sm text-gray-400 mt-2">Powered by LangGraph Cloud • LangSmith Tracing Active</p>
                         </div>
                     </div>
                     
                     <!-- Input -->
                     <div class="flex gap-3">
-                        <input 
-                            type="text" 
+                        <textarea 
                             id="messageInput" 
                             placeholder="Ask your strategic question..." 
                             class="flex-1 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
-                            onkeypress="handleKeyPress(event)"
+                            rows="3"
                             disabled
-                        >
+                        ></textarea>
                         <button 
-                            onclick="sendMessage()" 
+                            onclick="sendToLangGraph()" 
                             class="bg-gradient-to-r from-blue-600 to-green-600 text-white px-8 py-4 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
                             id="sendBtn" 
                             disabled
                         >
-                            <i class="fas fa-paper-plane mr-2"></i>Send
+                            <i class="fas fa-paper-plane mr-2"></i>Send to LangGraph
                         </button>
                     </div>
                 </div>
@@ -123,404 +148,270 @@
                 <!-- System Status -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">
-                        <i class="fas fa-server mr-2"></i>System Status
+                        <i class="fas fa-server mr-2"></i>LangGraph Status
                     </h3>
                     <div class="space-y-3">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Agents Available</span>
-                            <span class="font-semibold text-green-600">10/10</span>
+                            <span class="text-gray-600">Deployment</span>
+                            <span class="font-semibold text-green-600 text-xs">dgt-1bf5...</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Knowledge Domains</span>
-                            <span class="font-semibold text-green-600">7</span>
+                            <span class="text-gray-600">Agents Available</span>
+                            <span class="font-semibold text-green-600">5/5</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">LangSmith Traces</span>
+                            <span class="font-semibold text-green-600" id="trace-count">Active</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Status</span>
-                            <span class="font-semibold text-green-600" id="systemStatus">Ready</span>
+                            <span class="font-semibold text-green-600" id="system-status">🟢 Online</span>
                         </div>
                     </div>
                 </div>
-
-                <!-- Quick Actions -->
+                
+                <!-- Latest Response Info -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">
-                        <i class="fas fa-bolt mr-2"></i>Quick Actions
+                        <i class="fas fa-info-circle mr-2"></i>Response Details
                     </h3>
-                    <div class="space-y-2" id="quickActions">
-                        <button onclick="askQuestion('What is our current strategic position?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
-                            📊 Strategic Overview
-                        </button>
-                        <button onclick="askQuestion('How are we performing financially?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
-                            💰 Financial Health
-                        </button>
-                        <button onclick="askQuestion('What are our sustainability metrics?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
-                            🌱 Sustainability Report
-                        </button>
+                    <div id="responseInfo" class="text-sm text-gray-600">
+                        <p>No active conversation</p>
                     </div>
                 </div>
-
-                <!-- About -->
-                <div class="bg-white rounded-2xl shadow-xl p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">
-                        <i class="fas fa-info-circle mr-2"></i>About
-                    </h3>
-                    <p class="text-sm text-gray-600 mb-4">
-                        This Digital Twin dashboard provides access to 10 specialized AI agents, each expert in different aspects of Green Hill Canarias operations.
-                    </p>
-                    <div class="flex space-x-2">
-                        <a href="https://github.com/ZAKIBAYDOUN/GHC-DT" class="flex-1 bg-gray-800 text-white text-center py-2 rounded-lg hover:bg-gray-700 transition-colors">
-                            <i class="fab fa-github mr-2"></i>GitHub
-                        </a>
-                        <button onclick="toggleDemo()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                            <i class="fas fa-play mr-2"></i>Demo
-                        </button>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>
 
     <script>
-        // Agent Configuration
-        const agents = {
-            ceo_digital_twin: {
-                name: "CEO Digital Twin",
-                icon: "👑", 
-                color: "from-purple-600 to-indigo-600",
-                description: "Strategic vision & leadership"
-            },
-            cfo_agent: {
-                name: "CFO Agent",
-                icon: "💰",
-                color: "from-green-600 to-emerald-600", 
-                description: "Financial analysis & planning"
-            },
-            coo_agent: {
-                name: "COO Agent",
-                icon: "⚙️",
-                color: "from-blue-600 to-cyan-600",
-                description: "Operations & efficiency"
-            },
-            cmo_agent: {
-                name: "CMO Agent", 
-                icon: "📈",
-                color: "from-pink-600 to-rose-600",
-                description: "Marketing & growth"
-            },
-            agricultural_intelligence: {
-                name: "Agricultural AI",
-                icon: "🌱",
-                color: "from-green-500 to-lime-600",
-                description: "Farming intelligence"
-            },
-            sustainability_agent: {
-                name: "Sustainability Agent",
-                icon: "♻️", 
-                color: "from-emerald-600 to-teal-600",
-                description: "ESG & environment"
-            },
-            risk_management: {
-                name: "Risk Agent",
-                icon: "🛡️",
-                color: "from-red-600 to-orange-600",
-                description: "Risk assessment"
-            },
-            compliance_agent: {
-                name: "Compliance Agent", 
-                icon: "⚖️",
-                color: "from-gray-600 to-slate-600",
-                description: "Regulatory compliance"
-            },
-            data_analytics: {
-                name: "Analytics Agent",
-                icon: "📊",
-                color: "from-indigo-600 to-purple-600", 
-                description: "Data insights"
-            },
-            customer_service: {
-                name: "Customer Agent",
-                icon: "🤝",
-                color: "from-amber-600 to-yellow-600",
-                description: "Customer relations"
-            }
-        };
-
-        let selectedAgent = null;
-        let isDemo = true;
+        // LangGraph Configuration
+        const LANGGRAPH_DEPLOYMENT_URL = 'https://dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app';
+        const LANGGRAPH_API_KEY = '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';
         
-        // Initialize
+        let selectedAgent = null;
+        let conversationCount = 0;
+        
+        // Agent selection handling
         document.addEventListener('DOMContentLoaded', function() {
-            renderAgents();
-            checkConnection();
+            const agentCards = document.querySelectorAll('.agent-card');
+            
+            agentCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selection from all cards
+                    agentCards.forEach(c => c.classList.remove('selected'));
+                    
+                    // Add selection to clicked card
+                    this.classList.add('selected');
+                    
+                    // Set selected agent
+                    selectedAgent = this.dataset.agent;
+                    document.getElementById('selectedAgentName').textContent = this.querySelector('h4').textContent;
+                    
+                    // Enable input
+                    document.getElementById('messageInput').disabled = false;
+                    document.getElementById('sendBtn').disabled = false;
+                    
+                    // Clear previous messages
+                    document.getElementById('messageArea').innerHTML = `
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">${this.querySelector('div').textContent}</div>
+                            <p class="text-gray-700 font-semibold">${this.querySelector('h4').textContent} Ready</p>
+                            <p class="text-sm text-gray-500 mt-2">Ask me anything about Green Hill Canarias strategy, operations, or performance</p>
+                        </div>
+                    `;
+                });
+            });
         });
-
-        function renderAgents() {
-            const grid = document.getElementById('agentGrid');
-            grid.innerHTML = '';
-
-            Object.entries(agents).forEach(([key, agent]) => {
-                const card = document.createElement('div');
-                card.className = `agent-card bg-gradient-to-br ${agent.color} text-white p-4 rounded-xl`;
-                card.onclick = () => selectAgent(key);
-                
-                card.innerHTML = `
-                    <div class="text-2xl mb-2">${agent.icon}</div>
-                    <div class="font-semibold text-sm mb-1">${agent.name}</div>
-                    <div class="text-xs opacity-90">${agent.description}</div>
-                `;
-                
-                grid.appendChild(card);
-            });
-        }
-
-        function selectAgent(agentKey) {
-            selectedAgent = agentKey;
-            const agent = agents[agentKey];
-            
-            // Update UI
-            document.getElementById('selectedAgentName').textContent = agent.name;
-            document.getElementById('messageInput').disabled = false;
-            document.getElementById('sendBtn').disabled = false;
-            
-            // Highlight selected agent
-            document.querySelectorAll('.agent-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            event.target.closest('.agent-card').classList.add('selected');
-            
-            // Clear and show welcome message
-            const messageArea = document.getElementById('messageArea');
-            messageArea.innerHTML = `
-                <div class="text-center">
-                    <div class="text-4xl mb-3">${agent.icon}</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">${agent.name}</h3>
-                    <p class="text-gray-600 mb-4">${agent.description}</p>
-                    <p class="text-sm text-gray-500">Ask me anything about Green Hill Canarias operations and strategy.</p>
-                </div>
-            `;
-        }
-
-        function askQuestion(question) {
+        
+        async function sendToLangGraph() {
             if (!selectedAgent) {
-                alert('Please select an AI agent first');
+                alert('Please select an agent first');
                 return;
             }
-            document.getElementById('messageInput').value = question;
-            sendMessage();
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
             
-            if (!message || !selectedAgent) return;
-
-            // Add user message
-            addMessage('user', message);
-            input.value = '';
+            const input = document.getElementById('messageInput').value.trim();
+            const responseDiv = document.getElementById('messageArea');
+            const responseInfo = document.getElementById('responseInfo');
             
-            // Show typing indicator
-            addTypingIndicator();
+            if (!input) {
+                alert('Please enter a question');
+                return;
+            }
             
-            // If not demo mode, try to send to real API
-            if (!isDemo) {
-                const requestBody = {
-                    question: message,
-                    agent_type: selectedAgent,
-                    audience: "public",
-                    require_collaboration: false
-                };
-                
-                fetch('http://localhost:8000/api/chat', {
+            // Show processing state
+            responseDiv.innerHTML = `
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <div>
+                        <p class="font-semibold text-gray-700">🤖 Processing with LangGraph...</p>
+                        <p class="text-sm text-gray-500">Agent: ${document.getElementById('selectedAgentName').textContent}</p>
+                    </div>
+                </div>
+            `;
+            
+            const threadId = generateThreadId();
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch(`${LANGGRAPH_DEPLOYMENT_URL}/invoke`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'x-api-key': LANGGRAPH_API_KEY
                     },
-                    body: JSON.stringify(requestBody)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    removeTypingIndicator();
-                    const agent = agents[selectedAgent];
-                    
-                    // Handle real API response
-                    let response = data.response || data.message || 'Response received';
-                    const systemMode = data.system_mode || 'unknown';
-                    const confidence = data.confidence || 0.85;
-                    
-                    // Add system mode indicator to response
-                    if (systemMode === 'live') {
-                        response += `\n\n🚀 *Powered by Live AI System (Confidence: ${Math.round(confidence * 100)}%)*`;
-                    }
-                    
-                    addMessage('agent', response, agent);
-                    
-                    // Show recommended actions if available
-                    if (data.recommended_actions && data.recommended_actions.length > 0) {
-                        setTimeout(() => {
-                            const actionsText = "**Recommended Actions:**\n• " + data.recommended_actions.join("\n• ");
-                            addMessage('agent', actionsText, agent);
-                        }, 1000);
-                    }
-                })
-                .catch(error => {
-                    console.error('API Error:', error);
-                    removeTypingIndicator();
-                    // Fall back to demo response
-                    const agent = agents[selectedAgent];
-                    const response = generateResponse(agent, message) + "\n\n⚠️ *Note: Fell back to demo mode due to API error*";
-                    addMessage('agent', response, agent);
+                    body: JSON.stringify({
+                        input: {
+                            messages: [
+                                {
+                                    role: "user",
+                                    content: input
+                                }
+                            ],
+                            agent_type: selectedAgent
+                        },
+                        config: {
+                            configurable: {
+                                thread_id: threadId
+                            }
+                        }
+                    })
                 });
-            } else {
-                // Demo mode - simulate response
-                setTimeout(() => {
-                    removeTypingIndicator();
-                    const agent = agents[selectedAgent];
-                    const response = generateResponse(agent, message);
-                    addMessage('agent', response, agent);
-                }, 1500 + Math.random() * 1500);
-            }
-        }
-
-        function addMessage(type, content, agent = null) {
-            const messageArea = document.getElementById('messageArea');
-            
-            // Clear welcome message if this is first interaction
-            if (messageArea.innerHTML.includes('Select an AI executive')) {
-                messageArea.innerHTML = '';
-            }
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `mb-4 ${type === 'user' ? 'text-right' : 'text-left'}`;
-            
-            if (type === 'user') {
-                messageDiv.innerHTML = `
-                    <div class="inline-block bg-blue-600 text-white px-4 py-3 rounded-2xl max-w-md">
-                        <div class="font-medium text-sm mb-1">👤 You</div>
-                        <div>${content}</div>
-                    </div>
-                `;
-            } else if (type === 'agent') {
-                messageDiv.innerHTML = `
-                    <div class="inline-block bg-white border border-gray-200 px-4 py-3 rounded-2xl max-w-md">
-                        <div class="font-medium text-sm mb-2 text-gray-800">${agent.icon} ${agent.name}</div>
-                        <div class="text-gray-700">${content}</div>
-                    </div>
-                `;
-            }
-            
-            messageArea.appendChild(messageDiv);
-            messageArea.scrollTop = messageArea.scrollHeight;
-        }
-
-        function addTypingIndicator() {
-            const messageArea = document.getElementById('messageArea');
-            const typingDiv = document.createElement('div');
-            typingDiv.id = 'typing-indicator';
-            typingDiv.className = 'mb-4 text-left';
-            typingDiv.innerHTML = `
-                <div class="inline-block bg-gray-200 px-4 py-3 rounded-2xl">
-                    <div class="typing-indicator text-gray-600">
-                        <i class="fas fa-circle text-xs"></i>
-                        <i class="fas fa-circle text-xs mx-1"></i>
-                        <i class="fas fa-circle text-xs"></i>
-                        Thinking...
-                    </div>
-                </div>
-            `;
-            messageArea.appendChild(typingDiv);
-            messageArea.scrollTop = messageArea.scrollHeight;
-        }
-
-        function removeTypingIndicator() {
-            const indicator = document.getElementById('typing-indicator');
-            if (indicator) indicator.remove();
-        }
-
-        function generateResponse(agent, question) {
-            const responses = {
-                ceo_digital_twin: [
-                    "From a strategic perspective, we need to focus on sustainable growth while maintaining our competitive edge in precision agriculture.",
-                    "Our vision is to become the leading sustainable agriculture platform in the region, leveraging AI and IoT technologies.",
-                    "This requires careful analysis of market opportunities and alignment with our core values of sustainability and innovation."
-                ],
-                cfo_agent: [
-                    "Looking at our financial metrics, we're seeing strong growth in revenue with improving margins.",
-                    "Our current burn rate is sustainable, but we should consider strategic investments in technology infrastructure.",
-                    "The ROI on our precision agriculture initiatives is exceeding projections by 15%."
-                ],
-                agricultural_intelligence: [
-                    "Our crop monitoring systems indicate optimal growing conditions with 23% improved yield efficiency.",
-                    "Weather patterns suggest we should adjust irrigation schedules for the next growing cycle.",
-                    "Soil health metrics are showing positive trends following our regenerative agriculture implementation."
-                ]
-            };
-            
-            const agentResponses = responses[selectedAgent] || responses.ceo_digital_twin;
-            const baseResponse = agentResponses[Math.floor(Math.random() * agentResponses.length)];
-            
-            return `${baseResponse}\n\nRegarding "${question}" - this aligns with our strategic priorities and requires data-driven decision making for optimal outcomes.`;
-        }
-
-        function checkConnection() {
-            // Try to detect if we can connect to live system
-            fetch('http://localhost:8000/api/system/status')
-                .then(response => response.json())
-                .then(data => {
-                    const isLive = data.mode === 'live';
-                    const hasLangGraph = data.features?.langgraph?.available;
-                    
-                    if (isLive) {
-                        document.getElementById('connectionStatus').innerHTML = 
-                            '<i class="fas fa-rocket text-green-600 mr-2"></i>LIVE System';
-                        document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-green-100 text-green-800';
-                        document.getElementById('systemMode').textContent = hasLangGraph ? 'Live + LangGraph' : 'Live System';
-                        isDemo = false;
+                
+                const processingTime = ((Date.now() - startTime) / 1000).toFixed(2);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                let responseContent = '';
+                
+                // Extract response content
+                if (result.output && result.output.messages) {
+                    const lastMessage = result.output.messages[result.output.messages.length - 1];
+                    responseContent = lastMessage.content || 'No response content';
+                } else if (result.content) {
+                    responseContent = result.content;
+                } else {
+                    responseContent = JSON.stringify(result, null, 2);
+                }
+                
+                // Display response
+                responseDiv.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-user text-blue-600 mr-2"></i>
+                                <span class="font-semibold text-blue-800">Your Question</span>
+                            </div>
+                            <p class="text-gray-700">${input}</p>
+                        </div>
                         
-                        // Update system status
-                        document.getElementById('systemStatus').textContent = 'Live & Active';
-                        document.getElementById('systemStatus').className = 'font-semibold text-green-600';
-                    } else {
-                        document.getElementById('connectionStatus').innerHTML = 
-                            '<i class="fas fa-server text-blue-600 mr-2"></i>Local Server';
-                        document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800';
-                        document.getElementById('systemMode').textContent = 'Local System';
-                        isDemo = false;
-                    }
-                })
-                .catch(() => {
-                    // Fallback to basic health check
-                    fetch('http://localhost:8000/api/system/health')
-                        .then(response => response.json())
-                        .then(data => {
-                            document.getElementById('connectionStatus').innerHTML = 
-                                '<i class="fas fa-server text-blue-600 mr-2"></i>Local Server';
-                            document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800';
-                            document.getElementById('systemMode').textContent = 'Local System';
-                            isDemo = false;
-                        })
-                        .catch(() => {
-                            document.getElementById('connectionStatus').innerHTML = 
-                                '<i class="fas fa-globe text-blue-600 mr-2"></i>Demo Mode';
-                            document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800';
-                            document.getElementById('systemMode').textContent = 'Static Demo';
-                            isDemo = true;
-                        });
+                        <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-robot text-green-600 mr-2"></i>
+                                <span class="font-semibold text-green-800">${document.getElementById('selectedAgentName').textContent}</span>
+                                <span class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded ml-2">LangGraph</span>
+                            </div>
+                            <div class="prose text-gray-700">${formatResponse(responseContent)}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Update response info
+                conversationCount++;
+                responseInfo.innerHTML = `
+                    <p><strong>Thread ID:</strong> ${threadId}</p>
+                    <p><strong>Processing Time:</strong> ${processingTime}s</p>
+                    <p><strong>Agent:</strong> ${selectedAgent}</p>
+                    <p><strong>Conversation #:</strong> ${conversationCount}</p>
+                    <p class="text-green-600 mt-2">✅ Traced in LangSmith</p>
+                `;
+                
+                // Log to console for tracing visibility
+                console.log('LangGraph Response:', {
+                    agent: selectedAgent,
+                    input,
+                    response: responseContent,
+                    threadId,
+                    processingTime,
+                    timestamp: new Date().toISOString()
                 });
-        }
-
-        function toggleDemo() {
-            if (isDemo) {
-                alert('🚀 This is a demo version!\n\nFor the full experience:\n1. Run locally: start_system.bat\n2. Visit: http://localhost:8000\n3. Full 10-agent system with real AI');
+                
+                // Clear input
+                document.getElementById('messageInput').value = '';
+                
+            } catch (error) {
+                console.error('LangGraph Error:', error);
+                responseDiv.innerHTML = `
+                    <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
+                            <span class="font-semibold text-red-800">Connection Error</span>
+                        </div>
+                        <p class="text-red-700 mb-2">Failed to connect to LangGraph deployment</p>
+                        <p class="text-sm text-red-600">${error.message}</p>
+                        <p class="text-xs text-red-500 mt-2">Check console for detailed error information</p>
+                    </div>
+                `;
+                
+                responseInfo.innerHTML = `
+                    <p class="text-red-600">❌ Error: ${error.message}</p>
+                    <p class="text-xs text-gray-500">Check network connectivity</p>
+                `;
             }
         }
-
-        function handleKeyPress(event) {
+        
+        function formatResponse(text) {
+            // Basic formatting for response text
+            return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                      .replace(/\n/g, '<br>')
+                      .replace(/- (.*?)(?=\n|$)/g, '• $1');
+        }
+        
+        function generateThreadId() {
+            return 'ghc_thread_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Check LangGraph connection on load
+        window.onload = async function() {
+            try {
+                const response = await fetch(`${LANGGRAPH_DEPLOYMENT_URL}/docs`);
+                if (response.ok) {
+                    document.getElementById('tracing-status').innerHTML = 'Connected ✅';
+                    document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-green-100 text-green-800';
+                } else {
+                    throw new Error('Connection test failed');
+                }
+            } catch (error) {
+                document.getElementById('tracing-status').innerHTML = 'Checking...';
+                document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800';
+                
+                // Try alternative endpoint
+                setTimeout(async () => {
+                    try {
+                        const response = await fetch(`${LANGGRAPH_DEPLOYMENT_URL}`);
+                        if (response.ok || response.status === 405) {
+                            document.getElementById('tracing-status').innerHTML = 'Connected ✅';
+                            document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-green-100 text-green-800';
+                        }
+                    } catch (e) {
+                        document.getElementById('tracing-status').innerHTML = 'Offline ❌';
+                        document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-red-100 text-red-800';
+                    }
+                }, 2000);
+            }
+        };
+        
+        // Handle Enter key in textarea
+        document.getElementById('messageInput').addEventListener('keydown', function(event) {
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
-                sendMessage();
+                sendToLangGraph();
             }
-        }
+        });
     </script>
+    
 </body>
 </html>

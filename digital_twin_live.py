@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Enhanced Digital Twin System - LIVE MODE
 Green Hill Canarias - Production Ready with LangGraph Integration
@@ -165,9 +166,9 @@ KNOWLEDGE_BASE = {
         "Technology stack includes IoT sensors, AI-driven analytics, and blockchain supply chain tracking."
     ],
     "financial": [
-        "Q3 2024 Revenue: €3.2M (32% YoY growth)",
+        "Q3 2024 Revenue: 3.2M EUR (32% YoY growth)",
         "EBITDA Margin: 22% and improving through operational efficiency gains",
-        "Series A funding target: €8M for technology infrastructure and market expansion",
+        "Series A funding target: 8M EUR for technology infrastructure and market expansion",
         "Operating cash flow positive since Q2 2024"
     ],
     "operations": [

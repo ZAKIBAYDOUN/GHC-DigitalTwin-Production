@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Connection Test - GHC Digital Twin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen py-8">
+    <div class="container mx-auto max-w-4xl px-6">
+        
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-plug mr-2 text-green-600"></i>
+                    LangGraph Connection Test
+                </h1>
+                <p class="text-gray-600">Testing connection to your GHC Digital Twin deployment</p>
+                <p class="text-sm text-gray-500 mt-2">
+                    <strong>Deployment:</strong> dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app
+                </p>
+            </div>
+            
+            <div class="space-y-6">
+                
+                <!-- Test Buttons -->
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <button onclick="testBasicConnection()" 
+                            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-link mr-2"></i>Test Basic Connection
+                    </button>
+                    <button onclick="testCEOAgent()" 
+                            class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-user-tie mr-2"></i>Test CEO Agent
+                    </button>
+                    <button onclick="testAllEndpoints()" 
+                            class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                        <i class="fas fa-network-wired mr-2"></i>Test All Endpoints
+                    </button>
+                    <button onclick="clearResults()" 
+                            class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-trash mr-2"></i>Clear Results
+                    </button>
+                </div>
+                
+                <!-- Results Area -->
+                <div id="testResults" class="bg-gray-50 rounded-xl p-6 min-h-[400px]">
+                    <div class="text-center text-gray-500">
+                        <i class="fas fa-play-circle text-6xl mb-4 text-gray-300"></i>
+                        <p class="text-lg">Click a test button above to begin</p>
+                        <p class="text-sm mt-2">All tests will show LangSmith traces when successful</p>
+                    </div>
+                </div>
+                
+                <!-- Connection Info -->
+                <div class="bg-blue-50 rounded-xl p-6">
+                    <h3 class="font-semibold text-blue-800 mb-3">
+                        <i class="fas fa-info-circle mr-2"></i>Connection Information
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="font-semibold">Deployment URL:</span>
+                            <span class="text-gray-600 block mt-1 break-all">dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app</span>
+                        </div>
+                        <div>
+                            <span class="font-semibold">API Key:</span>
+                            <span class="text-gray-600 block mt-1">lsv2_sk_cc926...c_415de0beac</span>
+                        </div>
+                        <div>
+                            <span class="font-semibold">LangSmith Project:</span>
+                            <span class="text-gray-600 block mt-1">ghc-digital-twin</span>
+                        </div>
+                        <div>
+                            <span class="font-semibold">GitHub Pages:</span>
+                            <span class="text-gray-600 block mt-1">zakibaydoun.github.io/GHC-DigitalTwin-Production</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const LANGGRAPH_DEPLOYMENT_URL = 'https://dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app';
+        const LANGGRAPH_API_KEY = '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';
+        
+        const assistantIds = {
+            'ceo_digital_twin': '34747e20-39db-415e-bd80-597006f71a7a',
+            'cfo_agent': 'ff7afd85-51e0-4fdd-8ec5-a14508a100f9',
+            'coo_agent': '76f94782-5f1d-4ea0-8e69-294da3e1aefb'
+        };
+        
+        function logTest(title, status, message, details = null) {
+            const resultsDiv = document.getElementById('testResults');
+            const timestamp = new Date().toLocaleTimeString();
+            const statusColor = status === 'SUCCESS' ? 'text-green-600' : status === 'ERROR' ? 'text-red-600' : 'text-yellow-600';
+            const statusIcon = status === 'SUCCESS' ? 'fa-check-circle' : status === 'ERROR' ? 'fa-times-circle' : 'fa-clock';
+            
+            const testResult = document.createElement('div');
+            testResult.className = 'mb-4 p-4 bg-white rounded-lg border';
+            testResult.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center">
+                        <i class="fas ${statusIcon} ${statusColor} mr-2"></i>
+                        <div>
+                            <h4 class="font-semibold">${title}</h4>
+                            <p class="text-gray-600 text-sm">${message}</p>
+                            ${details ? `<pre class="text-xs text-gray-500 mt-2 bg-gray-50 p-2 rounded overflow-x-auto">${JSON.stringify(details, null, 2)}</pre>` : ''}
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-400">${timestamp}</span>
+                </div>
+            `;
+            
+            resultsDiv.appendChild(testResult);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = `
+                <div class="text-center text-gray-500">
+                    <i class="fas fa-play-circle text-6xl mb-4 text-gray-300"></i>
+                    <p class="text-lg">Results cleared - Ready for new tests</p>
+                </div>
+            `;
+        }
+        
+        async function testBasicConnection() {
+            logTest('Basic Connection', 'TESTING', 'Testing basic connectivity to LangGraph deployment...');
+            
+            try {
+                // Test multiple endpoints
+                const endpoints = [
+                    { name: 'Root', url: `${LANGGRAPH_DEPLOYMENT_URL}` },
+                    { name: 'Docs', url: `${LANGGRAPH_DEPLOYMENT_URL}/docs` },
+                    { name: 'OpenAPI', url: `${LANGGRAPH_DEPLOYMENT_URL}/openapi.json` }
+                ];
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(endpoint.url, {
+                            method: 'GET',
+                            headers: {
+                                'x-api-key': LANGGRAPH_API_KEY
+                            }
+                        });
+                        
+                        logTest(
+                            `${endpoint.name} Endpoint`,
+                            response.ok ? 'SUCCESS' : 'WARNING',
+                            `${endpoint.name}: ${response.status} ${response.statusText}`,
+                            { endpoint: endpoint.url, status: response.status, headers: Object.fromEntries(response.headers) }
+                        );
+                    } catch (error) {
+                        logTest(
+                            `${endpoint.name} Endpoint`,
+                            'ERROR',
+                            `Failed to reach ${endpoint.name}: ${error.message}`,
+                            { error: error.toString() }
+                        );
+                    }
+                }
+                
+            } catch (error) {
+                logTest('Basic Connection', 'ERROR', `Connection test failed: ${error.message}`, { error: error.toString() });
+            }
+        }
+        
+        async function testCEOAgent() {
+            logTest('CEO Agent Test', 'TESTING', 'Testing CEO Digital Twin agent with sample query...');
+            
+            try {
+                const response = await fetch(`${LANGGRAPH_DEPLOYMENT_URL}/invoke`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': LANGGRAPH_API_KEY
+                    },
+                    body: JSON.stringify({
+                        input: {
+                            messages: [
+                                {
+                                    role: "user",
+                                    content: "What is the current strategic position of Green Hill Canarias?"
+                                }
+                            ],
+                            agent_type: "ceo_digital_twin"
+                        },
+                        config: {
+                            configurable: {
+                                thread_id: `test_thread_${Date.now()}`
+                            }
+                        }
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    let responseContent = '';
+                    
+                    if (result.output && result.output.messages) {
+                        const lastMessage = result.output.messages[result.output.messages.length - 1];
+                        responseContent = lastMessage.content || 'No response content';
+                    } else if (result.content) {
+                        responseContent = result.content;
+                    } else {
+                        responseContent = JSON.stringify(result);
+                    }
+                    
+                    logTest(
+                        'CEO Agent Response',
+                        'SUCCESS',
+                        'CEO Digital Twin responded successfully!',
+                        {
+                            response_length: responseContent.length,
+                            response_preview: responseContent.substring(0, 200) + '...',
+                            full_result: result
+                        }
+                    );
+                } else {
+                    logTest(
+                        'CEO Agent Test',
+                        'ERROR',
+                        `CEO agent test failed: ${response.status} ${response.statusText}`,
+                        { status: response.status, statusText: response.statusText }
+                    );
+                }
+                
+            } catch (error) {
+                logTest('CEO Agent Test', 'ERROR', `CEO agent test error: ${error.message}`, { error: error.toString() });
+            }
+        }
+        
+        async function testAllEndpoints() {
+            logTest('Full System Test', 'TESTING', 'Testing all available endpoints and agents...');
+            
+            // Test basic connection first
+            await testBasicConnection();
+            
+            // Wait a moment
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Test CEO agent
+            await testCEOAgent();
+            
+            // Test other endpoints
+            const testEndpoints = [
+                { method: 'POST', path: '/runs/stream', name: 'Streaming' },
+                { method: 'POST', path: '/runs/wait', name: 'Synchronous Run' }
+            ];
+            
+            for (const endpoint of testEndpoints) {
+                try {
+                    logTest(`${endpoint.name} Test`, 'TESTING', `Testing ${endpoint.path}...`);
+                    
+                    const response = await fetch(`${LANGGRAPH_DEPLOYMENT_URL}${endpoint.path}`, {
+                        method: endpoint.method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': LANGGRAPH_API_KEY
+                        },
+                        body: JSON.stringify({
+                            input: {
+                                messages: [{ role: "user", content: "Test message" }]
+                            },
+                            config: {
+                                configurable: {
+                                    thread_id: `test_${Date.now()}`
+                                }
+                            }
+                        })
+                    });
+                    
+                    logTest(
+                        `${endpoint.name} Endpoint`,
+                        response.ok ? 'SUCCESS' : 'WARNING',
+                        `${endpoint.path}: ${response.status} ${response.statusText}`,
+                        { status: response.status, endpoint: endpoint.path }
+                    );
+                    
+                } catch (error) {
+                    logTest(`${endpoint.name} Test`, 'ERROR', `${endpoint.path} failed: ${error.message}`);
+                }
+                
+                // Brief delay between tests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            logTest('Full System Test', 'SUCCESS', 'All endpoint tests completed! Check individual results above.');
+        }
+        
+        // Test basic connection on page load
+        window.onload = function() {
+            setTimeout(() => {
+                logTest('Page Loaded', 'SUCCESS', 'LangGraph connection test page initialized');
+            }, 500);
+        };
+    </script>
+</body>
+</html>
