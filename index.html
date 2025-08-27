@@ -34,10 +34,11 @@
                 <p class="text-sm text-gray-600 mb-2">Powered by LangGraph Cloud Deployment</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                        <p class="text-gray-600">🔗 Deployment ID: <code class="text-xs bg-gray-100 px-1">4d951c07-a841-4fb9-84b7-7816797416b9</code></p>
+                        <p class="text-gray-600">🔗 Assistant ID: <code class="text-xs bg-gray-100 px-1">4cc9f4b5-6725-5394-98ba-5f55b15cd94f</code></p>
                     </div>
                     <div>
                         <p class="text-gray-600">📊 LangSmith Tracing: <span id="tracing-status" class="text-green-600 font-semibold">Active</span></p>
+                        <p class="text-gray-600 text-xs mt-1">Thread: <span id="current-thread" class="font-mono">Creating...</span></p>
                     </div>
                 </div>
             </div>
@@ -102,12 +103,43 @@
     </div>
 
     <script>
-        // LangGraph Configuration - COMPLETE SETUP
-        const DEPLOYMENT_ID = '4d951c07-a841-4fb9-84b7-7816797416b9';
+        // LangGraph Configuration - FIXED WITH CORRECT ASSISTANT ID
+        const ASSISTANT_ID = '4cc9f4b5-6725-5394-98ba-5f55b15cd94f';
         const LANGGRAPH_BASE_URL = 'https://dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app';
         const LANGGRAPH_API_KEY = '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';
 
         let currentAgent = 'ceo_digital_twin';
+        let currentThreadId = null;
+
+        // Create a thread for the session
+        async function createThread() {
+            try {
+                const response = await fetch(`${LANGGRAPH_BASE_URL}/threads`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Api-Key': LANGGRAPH_API_KEY,
+                    },
+                    body: JSON.stringify({
+                        assistant_id: ASSISTANT_ID
+                    })
+                });
+
+                if (response.ok) {
+                    const threadData = await response.json();
+                    currentThreadId = threadData.thread_id;
+                    document.getElementById('current-thread').textContent = currentThreadId.substring(0, 8) + '...';
+                    console.log('✅ Thread created:', currentThreadId);
+                    return currentThreadId;
+                } else {
+                    throw new Error(`Thread creation failed: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Thread creation error:', error);
+                document.getElementById('current-thread').textContent = 'Failed';
+                return null;
+            }
+        }
 
         // Agent selection with proper visual feedback
         function selectAgent(agent) {
@@ -141,20 +173,30 @@
                 return;
             }
 
+            // Ensure we have a thread
+            if (!currentThreadId) {
+                statusDiv.innerHTML = '🧵 Creating thread...';
+                await createThread();
+                if (!currentThreadId) {
+                    errorDiv.innerHTML = '❌ Could not create thread';
+                    return;
+                }
+            }
+
             responseDiv.innerHTML = '<div class="text-gray-500 animate-pulse">🤖 Processing with LangGraph Cloud...</div>';
             errorDiv.innerHTML = '';
             statusDiv.innerHTML = '⏳ Sending request...';
 
             try {
-                // Use the correct LangGraph Cloud endpoint structure
-                const response = await fetch(`${LANGGRAPH_BASE_URL}/runs/stream`, {
+                // Use the CORRECT LangGraph Cloud workflow: Thread -> Stream
+                const response = await fetch(`${LANGGRAPH_BASE_URL}/threads/${currentThreadId}/runs/stream`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Api-Key': LANGGRAPH_API_KEY,
                     },
                     body: JSON.stringify({
-                        assistant_id: DEPLOYMENT_ID,
+                        assistant_id: ASSISTANT_ID,
                         input: {
                             messages: [
                                 {
@@ -167,11 +209,6 @@
                             agent_type: currentAgent,
                             source: "github_pages_live"
                         },
-                        config: {
-                            configurable: {
-                                thread_id: `thread_${Date.now()}`
-                            }
-                        },
                         stream_mode: "values"
                     })
                 });
@@ -179,6 +216,17 @@
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('LangGraph error:', response.status, errorText);
+                    
+                    // If thread not found, create new one and retry
+                    if (response.status === 404 && errorText.includes('Thread')) {
+                        console.log('Thread not found, creating new one...');
+                        await createThread();
+                        if (currentThreadId) {
+                            // Retry with new thread
+                            return sendToLangGraph();
+                        }
+                    }
+                    
                     throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
 
@@ -206,7 +254,7 @@
                                 eventCount++;
                                 console.log(`Event ${eventCount}:`, data);
                                 
-                                // Extract content from various possible structures
+                                // Extract content from LangGraph response
                                 if (data.messages && data.messages.length > 0) {
                                     const lastMessage = data.messages[data.messages.length - 1];
                                     if (lastMessage && lastMessage.content) {
@@ -228,13 +276,13 @@
                     }
                 }
 
-                console.log(`Processed ${eventCount} events, final response length: ${finalResponse.length}`);
+                console.log(`✅ Processed ${eventCount} events, response length: ${finalResponse.length}`);
 
                 if (finalResponse) {
                     displayResponse(finalResponse);
-                    statusDiv.innerHTML = '✅ Response received from LangGraph';
+                    statusDiv.innerHTML = '✅ Response from LangGraph';
                 } else {
-                    throw new Error('No response content received from stream');
+                    throw new Error('No response content received');
                 }
 
                 document.getElementById('user-input').value = '';
@@ -337,7 +385,7 @@ Our sustainability leadership creates competitive advantage and investor appeal.
 
                 displayFallbackResponse(fallbackResponses[currentAgent] || fallbackResponses['ceo_digital_twin'], error.message);
                 errorDiv.innerHTML = `⚠️ Using enhanced local response. Error: ${error.message}`;
-                statusDiv.innerHTML = '🟡 Enhanced local mode';
+                statusDiv.innerHTML = '🟡 Local mode';
             }
         }
 
@@ -375,13 +423,16 @@ Our sustainability leadership creates competitive advantage and investor appeal.
         }
 
         // Initialize on load
-        window.onload = function() {
+        window.onload = async function() {
             console.log('🌿 GHC Digital Twin initialized');
-            console.log('📊 Deployment ID:', DEPLOYMENT_ID);
+            console.log('🤖 Assistant ID:', ASSISTANT_ID);
             console.log('🔗 LangGraph URL:', LANGGRAPH_BASE_URL);
             console.log('🔑 API Key configured:', LANGGRAPH_API_KEY ? '✅' : '❌');
             
             document.getElementById('langgraph-status').innerHTML = '🟢 Ready';
+            
+            // Create initial thread
+            await createThread();
             
             // Select CEO by default
             document.getElementById('agent-ceo').click();
