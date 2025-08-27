@@ -30,8 +30,13 @@ if not exist "venv" (
 echo Activating virtual environment...
 call venv\Scripts\activate.bat
 
-echo Installing basic requirements...
-pip install fastapi uvicorn python-dotenv requests
+echo Installing requirements...
+if exist "requirements.txt" (
+    pip install -r requirements.txt
+) else (
+    echo Installing basic requirements...
+    pip install fastapi uvicorn python-dotenv requests pydantic
+)
 
 REM Check for .env file
 if not exist ".env" (
@@ -42,6 +47,8 @@ if not exist ".env" (
         echo # Basic configuration > .env
         echo DR_BASE_URL=https://digitalroots-bf3899aefd705f6789c2466e0c9b974d.us.langgraph.app >> .env
         echo DR_API_KEY=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 >> .env
+        echo HOST=0.0.0.0 >> .env
+        echo PORT=8000 >> .env
         echo ? Created basic .env file
     )
 )
@@ -60,11 +67,20 @@ echo ?? Access at: http://localhost:8000
 echo.
 echo API Endpoints:
 echo - GET  /api/agents          (List agents)
-echo - POST /api/chat            (Chat with agents) 
+echo - POST /api/ask             (Chat with agents) 
 echo - GET  /api/system/health   (System status)
 echo.
 
 REM Start the system
-python simple_digital_twin.py
+if exist "simple_digital_twin.py" (
+    python simple_digital_twin.py
+) else if exist "api\server.py" (
+    echo Starting API server...
+    cd api && python server.py
+) else (
+    echo ERROR: No startup script found
+    pause
+    exit /b 1
+)
 
 pause

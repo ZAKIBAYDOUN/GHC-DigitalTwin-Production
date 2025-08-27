@@ -1,0 +1,18 @@
+{
+  "dependencies": [
+    "langgraph",
+    "langchain-core",
+    "langsmith",
+    "fastapi",
+    "uvicorn[standard]",
+    "python-dotenv",
+    "requests",
+    "pydantic",
+    "httpx"
+  ],
+  "graphs": {
+    "ghc_digital_twin": "./api/graph.py:graph"
+  },
+  "env": ".env",
+  "python_version": "3.11"
+}

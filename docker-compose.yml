@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  ghc-digital-twin:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+    
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - ghc-digital-twin
+    environment:
+      - NEXT_PUBLIC_API_URL=http://ghc-digital-twin:8000
+    restart: unless-stopped

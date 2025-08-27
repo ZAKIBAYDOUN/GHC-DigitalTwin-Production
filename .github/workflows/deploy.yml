@@ -27,45 +27,40 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Setup Node.js (for any build tools)
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
 
-    - name: Create static build
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Create deployment structure
       run: |
-        # Ensure we have the main HTML file
+        # Ensure main index.html exists
         if [ ! -f "index.html" ]; then
-          if [ -f "index_digital_twin.html" ]; then
-            cp index_digital_twin.html index.html
-          else
-            echo "Creating basic index.html"
-            cat > index.html << 'EOF'
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>?? Green Hill Canarias - Digital Twin</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-        </head>
-        <body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
-            <div class="text-center">
-                <div class="text-6xl mb-4">??</div>
-                <h1 class="text-4xl font-bold text-green-800 mb-4">Green Hill Canarias</h1>
-                <h2 class="text-2xl text-gray-600 mb-6">Digital Twin - Coming Soon</h2>
-                <p class="text-lg text-gray-500 mb-8">Sophisticated AI-powered startup dashboard</p>
-                <a href="https://github.com/ZAKIBAYDOUN/GHC-DT" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors">
-                    View on GitHub
-                </a>
-            </div>
-        </body>
-        </html>
-        EOF
-          fi
+          echo "ERROR: index.html not found!"
+          exit 1
         fi
         
-        # Create a basic 404 page
+        # Validate HTML file
+        if ! grep -q "Green Hill Canarias" index.html; then
+          echo "WARNING: index.html may be corrupted"
+        fi
+        
+        # Create assets directory if it doesn't exist
+        mkdir -p assets
+        
+        # Copy any additional HTML files
+        for file in index_*.html; do
+          if [ -f "$file" ]; then
+            cp "$file" assets/
+          fi
+        done
+        
+        # Create basic 404 page
         cat > 404.html << 'EOF'
         <!DOCTYPE html>
         <html lang="en">
@@ -85,6 +80,26 @@ jobs:
             </div>
         </body>
         </html>
+        EOF
+
+        # Create robots.txt
+        cat > robots.txt << 'EOF'
+        User-agent: *
+        Allow: /
+        
+        Sitemap: https://zakibaydoun.github.io/GHC-DigitalTwin-Production/sitemap.xml
+        EOF
+
+        # Create sitemap.xml
+        cat > sitemap.xml << 'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+          <url>
+            <loc>https://zakibaydoun.github.io/GHC-DigitalTwin-Production/</loc>
+            <lastmod>2024-01-01T00:00:00+00:00</lastmod>
+            <priority>1.0</priority>
+          </url>
+        </urlset>
         EOF
 
     - name: Setup Pages

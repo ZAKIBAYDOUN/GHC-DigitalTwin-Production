@@ -1,0 +1,28 @@
+# Vercel Configuration for GHC Digital Twin
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "simple_digital_twin.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "simple_digital_twin.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/$1"
+    }
+  ],
+  "env": {
+    "DR_BASE_URL": "@dr_base_url",
+    "DR_API_KEY": "@dr_api_key"
+  }
+}
