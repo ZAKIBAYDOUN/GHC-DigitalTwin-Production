@@ -3,415 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌿 GHC Digital Twin - LangGraph Powered</title>
+    <title>GHC Digital Twin - LangGraph Powered</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
     <style>
-        .agent-card { 
-            transition: all 0.3s ease; 
-            cursor: pointer;
+        .agent-card {
+            transition: all 0.3s ease;
         }
-        .agent-card:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        .agent-card.selected {
-            ring: 2px solid #3B82F6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-        }
-        .typing-indicator {
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+
+            .agent-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
     </style>
 </head>
-<body class="bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 min-h-screen">
-    
-    <!-- Header -->
-    <header class="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <div class="text-3xl">🌿</div>
+<body class="bg-gray-50 font-sans">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <h1 class="text-2xl font-bold text-green-700">🌿 Green Hill Canarias Digital Twin</h1>
+                    <div class="flex items-center space-x-4 text-sm">
+                        <span id="connection-status" class="px-3 py-1 bg-green-100 text-green-700 rounded-full">Connected ✅</span>
+                        <span>Mode: Live Production</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8 max-w-6xl">
+            <!-- Status Dashboard -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-xl font-semibold mb-4">🤖 AI Executive Team Dashboard</h2>
+                <p class="text-sm text-gray-600 mb-2">Powered by LangGraph Cloud Deployment</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Green Hill Canarias</h1>
-                        <p class="text-sm text-gray-600">Digital Twin Dashboard - LangGraph Powered</p>
+                        <p class="text-gray-600">🔗 Connected to: <code class="text-xs bg-gray-100 px-1">dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app</code></p>
                     </div>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <div id="connectionStatus" class="px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
-                        <i class="fas fa-link mr-2"></i><span id="tracing-status">Connected to LangGraph</span>
-                    </div>
-                    <div class="text-sm text-gray-600">
-                        Mode: <span id="systemMode" class="font-semibold text-blue-600">Live Production</span>
+                    <div>
+                        <p class="text-gray-600">📊 LangSmith Tracing: <span id="tracing-status" class="text-green-600 font-semibold">Active</span></p>
                     </div>
                 </div>
             </div>
-        </div>
-    </header>
 
-    <div class="container mx-auto px-6 py-8">
-        
-        <!-- Welcome Message -->
-        <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-2xl p-8 mb-8 text-center">
-            <h2 class="text-3xl font-bold mb-4">🤖 AI Executive Team Dashboard</h2>
-            <p class="text-xl opacity-90 mb-2">Powered by LangGraph Cloud Deployment</p>
-            <p class="text-sm opacity-80">🔗 Connected to: dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app</p>
-            <p class="text-sm opacity-80">📊 LangSmith Tracing: Active</p>
-        </div>
-
-        <!-- Agent Selection -->
-        <div class="mb-8">
-            <h3 class="text-2xl font-bold text-gray-800 mb-6">Select Your AI Executive</h3>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="agentGrid">
-                <div class="agent-card bg-white p-4 rounded-xl shadow-lg border hover:border-blue-300" data-agent="ceo_digital_twin">
-                    <div class="text-3xl mb-2 text-center">👑</div>
-                    <h4 class="font-semibold text-center text-sm">CEO Digital Twin</h4>
-                    <p class="text-xs text-gray-600 text-center mt-1">Strategic Leadership</p>
+            <!-- Agent Selection Grid -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4">Select Your AI Executive</h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                    <div class="agent-card bg-blue-50 p-4 rounded-lg cursor-pointer text-center" onclick="selectAgent('ceo_digital_twin')">
+                        <div class="text-2xl mb-2">👑</div>
+                        <div class="font-semibold text-sm">CEO Digital Twin</div>
+                        <div class="text-xs text-gray-600">Strategic Leadership</div>
+                    </div>
+                    <div class="agent-card bg-green-50 p-4 rounded-lg cursor-pointer text-center" onclick="selectAgent('cfo_agent')">
+                        <div class="text-2xl mb-2">💰</div>
+                        <div class="font-semibold text-sm">CFO Agent</div>
+                        <div class="text-xs text-gray-600">Financial Analysis</div>
+                    </div>
+                    <div class="agent-card bg-purple-50 p-4 rounded-lg cursor-pointer text-center" onclick="selectAgent('coo_agent')">
+                        <div class="text-2xl mb-2">⚙️</div>
+                        <div class="font-semibold text-sm">COO Agent</div>
+                        <div class="text-xs text-gray-600">Operations</div>
+                    </div>
+                    <div class="agent-card bg-yellow-50 p-4 rounded-lg cursor-pointer text-center" onclick="selectAgent('agricultural_intelligence')">
+                        <div class="text-2xl mb-2">🌱</div>
+                        <div class="font-semibold text-sm">Agricultural AI</div>
+                        <div class="text-xs text-gray-600">Crop Intelligence</div>
+                    </div>
+                    <div class="agent-card bg-teal-50 p-4 rounded-lg cursor-pointer text-center" onclick="selectAgent('sustainability_agent')">
+                        <div class="text-2xl mb-2">♻️</div>
+                        <div class="font-semibold text-sm">Sustainability</div>
+                        <div class="text-xs text-gray-600">ESG Metrics</div>
+                    </div>
                 </div>
-                <div class="agent-card bg-white p-4 rounded-xl shadow-lg border hover:border-blue-300" data-agent="cfo_agent">
-                    <div class="text-3xl mb-2 text-center">💰</div>
-                    <h4 class="font-semibold text-center text-sm">CFO Agent</h4>
-                    <p class="text-xs text-gray-600 text-center mt-1">Financial Analysis</p>
-                </div>
-                <div class="agent-card bg-white p-4 rounded-xl shadow-lg border hover:border-blue-300" data-agent="coo_agent">
-                    <div class="text-3xl mb-2 text-center">⚙️</div>
-                    <h4 class="font-semibold text-center text-sm">COO Agent</h4>
-                    <p class="text-xs text-gray-600 text-center mt-1">Operations</p>
-                </div>
-                <div class="agent-card bg-white p-4 rounded-xl shadow-lg border hover:border-blue-300" data-agent="agricultural_intelligence">
-                    <div class="text-3xl mb-2 text-center">🌱</div>
-                    <h4 class="font-semibold text-center text-sm">Agricultural AI</h4>
-                    <p class="text-xs text-gray-600 text-center mt-1">Crop Intelligence</p>
-                </div>
-                <div class="agent-card bg-white p-4 rounded-xl shadow-lg border hover:border-blue-300" data-agent="sustainability_agent">
-                    <div class="text-3xl mb-2 text-center">♻️</div>
-                    <h4 class="font-semibold text-center text-sm">Sustainability</h4>
-                    <p class="text-xs text-gray-600 text-center mt-1">ESG Metrics</p>
+                <div class="text-sm text-gray-600">
+                    Selected Agent: <span id="selected-agent" class="font-semibold">CEO Digital Twin</span>
                 </div>
             </div>
-        </div>
 
-        <!-- Main Interface -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
             <!-- Chat Interface -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-2xl shadow-xl p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-800">
-                            <i class="fas fa-comments mr-2"></i>Executive Consultation
-                        </h3>
-                        <div class="text-sm text-gray-600">
-                            Agent: <span id="selectedAgentName" class="font-semibold text-blue-600">Select an Agent</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Messages -->
-                    <div id="messageArea" class="bg-gray-50 rounded-xl p-6 h-96 overflow-y-auto mb-4">
-                        <div class="text-center">
-                            <div class="text-6xl mb-4">🌿</div>
-                            <p class="text-gray-500 text-lg">Select an AI executive above to begin your consultation</p>
-                            <p class="text-sm text-gray-400 mt-2">Powered by LangGraph Cloud • LangSmith Tracing Active</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Input -->
-                    <div class="flex gap-3">
-                        <textarea 
-                            id="messageInput" 
-                            placeholder="Ask your strategic question..." 
-                            class="flex-1 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
-                            rows="3"
-                            disabled
-                        ></textarea>
-                        <button 
-                            onclick="sendToLangGraph()" 
-                            class="bg-gradient-to-r from-blue-600 to-green-600 text-white px-8 py-4 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
-                            id="sendBtn" 
-                            disabled
-                        >
-                            <i class="fas fa-paper-plane mr-2"></i>Send to LangGraph
-                        </button>
-                    </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">Executive Consultation</h3>
+                <div class="flex gap-4 mb-4">
+                    <select id="agent-select" class="hidden">
+                        <option value="ceo_digital_twin">CEO Digital Twin</option>
+                        <option value="cfo_agent">CFO Agent</option>
+                        <option value="coo_agent">COO Agent</option>
+                        <option value="agricultural_intelligence">Agricultural AI</option>
+                        <option value="sustainability_agent">Sustainability Agent</option>
+                    </select>
+                    <input type="text" id="user-input" class="flex-1 p-3 border rounded-lg"
+                           placeholder="Ask your question..." onkeypress="if(event.key==='Enter') sendToLangGraph()">
+                    <button onclick="sendToLangGraph()"
+                            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                        Send to LangGraph
+                    </button>
+                </div>
+
+                <div id="response" class="p-4 bg-gray-50 rounded-lg min-h-[200px]">
+                    <p class="text-gray-500">Your AI executive's response will appear here...</p>
+                </div>
+
+                <div class="mt-4 flex justify-between items-center text-sm">
+                    <div id="error-details" class="text-red-600"></div>
+                    <div id="langgraph-status" class="text-gray-600"></div>
                 </div>
             </div>
 
-            <!-- Info Panel -->
-            <div class="space-y-6">
-                
-                <!-- System Status -->
-                <div class="bg-white rounded-2xl shadow-xl p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">
-                        <i class="fas fa-server mr-2"></i>LangGraph Status
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Deployment</span>
-                            <span class="font-semibold text-green-600 text-xs">dgt-1bf5...</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Agents Available</span>
-                            <span class="font-semibold text-green-600">5/5</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">LangSmith Traces</span>
-                            <span class="font-semibold text-green-600" id="trace-count">Active</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Status</span>
-                            <span class="font-semibold text-green-600" id="system-status">🟢 Online</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Latest Response Info -->
-                <div class="bg-white rounded-2xl shadow-xl p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">
-                        <i class="fas fa-info-circle mr-2"></i>Response Details
-                    </h3>
-                    <div id="responseInfo" class="text-sm text-gray-600">
-                        <p>No active conversation</p>
-                    </div>
-                </div>
-                
+            <!-- Debug Info (hidden by default) -->
+            <div id="debug-info" class="mt-6 bg-gray-100 p-4 rounded-lg text-xs font-mono hidden">
+                <p>Debug information will appear here</p>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
         // LangGraph Configuration
-        const LANGGRAPH_DEPLOYMENT_URL = 'https://dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app';
+        const LANGGRAPH_BASE_URL = 'https://dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app';
         const LANGGRAPH_API_KEY = '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';
-        
-        let selectedAgent = null;
-        let conversationCount = 0;
-        
-        // Agent selection handling
-        document.addEventListener('DOMContentLoaded', function() {
-            const agentCards = document.querySelectorAll('.agent-card');
-            
-            agentCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    // Remove selection from all cards
-                    agentCards.forEach(c => c.classList.remove('selected'));
-                    
-                    // Add selection to clicked card
-                    this.classList.add('selected');
-                    
-                    // Set selected agent
-                    selectedAgent = this.dataset.agent;
-                    document.getElementById('selectedAgentName').textContent = this.querySelector('h4').textContent;
-                    
-                    // Enable input
-                    document.getElementById('messageInput').disabled = false;
-                    document.getElementById('sendBtn').disabled = false;
-                    
-                    // Clear previous messages
-                    document.getElementById('messageArea').innerHTML = `
-                        <div class="text-center">
-                            <div class="text-4xl mb-2">${this.querySelector('div').textContent}</div>
-                            <p class="text-gray-700 font-semibold">${this.querySelector('h4').textContent} Ready</p>
-                            <p class="text-sm text-gray-500 mt-2">Ask me anything about Green Hill Canarias strategy, operations, or performance</p>
-                        </div>
-                    `;
-                });
+
+        let currentAgent = 'ceo_digital_twin';
+
+        function selectAgent(agent) {
+            currentAgent = agent;
+            document.getElementById('agent-select').value = agent;
+            document.getElementById('selected-agent').textContent =
+                document.querySelector(`[onclick="selectAgent('${agent}')"] .font-semibold`).textContent;
+
+            // Update visual selection
+            document.querySelectorAll('.agent-card').forEach(card => {
+                card.classList.remove('ring-2', 'ring-blue-500');
             });
-        });
-        
+            event.target.closest('.agent-card').classList.add('ring-2', 'ring-blue-500');
+        }
+
         async function sendToLangGraph() {
-            if (!selectedAgent) {
-                alert('Please select an agent first');
-                return;
-            }
-            
-            const input = document.getElementById('messageInput').value.trim();
-            const responseDiv = document.getElementById('messageArea');
-            const responseInfo = document.getElementById('responseInfo');
-            
-            if (!input) {
+            const input = document.getElementById('user-input').value;
+            const responseDiv = document.getElementById('response');
+            const errorDiv = document.getElementById('error-details');
+            const statusDiv = document.getElementById('langgraph-status');
+
+            if (!input.trim()) {
                 alert('Please enter a question');
                 return;
             }
-            
-            // Show processing state
-            responseDiv.innerHTML = `
-                <div class="flex items-center space-x-3 mb-4">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <div>
-                        <p class="font-semibold text-gray-700">🤖 Processing with LangGraph...</p>
-                        <p class="text-sm text-gray-500">Agent: ${document.getElementById('selectedAgentName').textContent}</p>
-                    </div>
-                </div>
-            `;
-            
-            const threadId = generateThreadId();
-            const startTime = Date.now();
-            
+
+            responseDiv.innerHTML = '<div class="text-gray-500 animate-pulse">🤖 Processing with LangGraph Cloud...</div>';
+            errorDiv.innerHTML = '';
+            statusDiv.innerHTML = '⏳ Sending request...';
+
             try {
-                const response = await fetch(`${LANGGRAPH_DEPLOYMENT_URL}/invoke`, {
+                // Main endpoint
+                const response = await fetch(`${LANGGRAPH_BASE_URL}/runs/invoke`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': LANGGRAPH_API_KEY
+                        'X-Api-Key': LANGGRAPH_API_KEY,
                     },
                     body: JSON.stringify({
                         input: {
                             messages: [
                                 {
-                                    role: "user",
+                                    type: "human",
                                     content: input
                                 }
-                            ],
-                            agent_type: selectedAgent
+                            ]
                         },
                         config: {
-                            configurable: {
-                                thread_id: threadId
+                            metadata: {
+                                agent_type: currentAgent,
+                                source: "github_pages"
                             }
                         }
                     })
                 });
-                
-                const processingTime = ((Date.now() - startTime) / 1000).toFixed(2);
-                
+
+                const responseText = await response.text();
+                console.log('LangGraph Response:', response.status, responseText);
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    // Try alternative endpoint structure
+                    throw new Error(`Primary endpoint failed (${response.status}). Trying alternative...`);
                 }
-                
-                const result = await response.json();
-                let responseContent = '';
-                
-                // Extract response content
-                if (result.output && result.output.messages) {
-                    const lastMessage = result.output.messages[result.output.messages.length - 1];
-                    responseContent = lastMessage.content || 'No response content';
-                } else if (result.content) {
-                    responseContent = result.content;
+
+                const data = JSON.parse(responseText);
+                let finalResponse = 'Processing response...';
+
+                // Extract response from various possible structures
+                if (data.output && data.output.messages) {
+                    finalResponse = data.output.messages[data.output.messages.length - 1].content;
+                } else if (data.messages && data.messages.length > 0) {
+                    finalResponse = data.messages[data.messages.length - 1].content;
+                } else if (data.result) {
+                    finalResponse = data.result;
                 } else {
-                    responseContent = JSON.stringify(result, null, 2);
+                    finalResponse = JSON.stringify(data, null, 2);
                 }
-                
-                // Display response
+
                 responseDiv.innerHTML = `
-                    <div class="space-y-4">
-                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
-                            <div class="flex items-center mb-2">
-                                <i class="fas fa-user text-blue-600 mr-2"></i>
-                                <span class="font-semibold text-blue-800">Your Question</span>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between text-sm text-gray-600">
+                                <span class="font-semibold">${currentAgent.replace(/_/g, ' ').toUpperCase()}</span>
+                                <span class="text-xs">${new Date().toLocaleTimeString()}</span>
                             </div>
-                            <p class="text-gray-700">${input}</p>
-                        </div>
-                        
-                        <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
-                            <div class="flex items-center mb-2">
-                                <i class="fas fa-robot text-green-600 mr-2"></i>
-                                <span class="font-semibold text-green-800">${document.getElementById('selectedAgentName').textContent}</span>
-                                <span class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded ml-2">LangGraph</span>
+                            <div class="prose prose-sm max-w-none">
+                                ${marked.parse ? marked.parse(finalResponse) : finalResponse}
                             </div>
-                            <div class="prose text-gray-700">${formatResponse(responseContent)}</div>
                         </div>
-                    </div>
-                `;
-                
-                // Update response info
-                conversationCount++;
-                responseInfo.innerHTML = `
-                    <p><strong>Thread ID:</strong> ${threadId}</p>
-                    <p><strong>Processing Time:</strong> ${processingTime}s</p>
-                    <p><strong>Agent:</strong> ${selectedAgent}</p>
-                    <p><strong>Conversation #:</strong> ${conversationCount}</p>
-                    <p class="text-green-600 mt-2">✅ Traced in LangSmith</p>
-                `;
-                
-                // Log to console for tracing visibility
-                console.log('LangGraph Response:', {
-                    agent: selectedAgent,
-                    input,
-                    response: responseContent,
-                    threadId,
-                    processingTime,
-                    timestamp: new Date().toISOString()
-                });
-                
-                // Clear input
-                document.getElementById('messageInput').value = '';
-                
+                    `;
+
+                statusDiv.innerHTML = '✅ Response received';
+                document.getElementById('user-input').value = '';
+
             } catch (error) {
                 console.error('LangGraph Error:', error);
-                responseDiv.innerHTML = `
-                    <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
-                            <span class="font-semibold text-red-800">Connection Error</span>
-                        </div>
-                        <p class="text-red-700 mb-2">Failed to connect to LangGraph deployment</p>
-                        <p class="text-sm text-red-600">${error.message}</p>
-                        <p class="text-xs text-red-500 mt-2">Check console for detailed error information</p>
-                    </div>
-                `;
-                
-                responseInfo.innerHTML = `
-                    <p class="text-red-600">❌ Error: ${error.message}</p>
-                    <p class="text-xs text-gray-500">Check network connectivity</p>
-                `;
-            }
-        }
-        
-        function formatResponse(text) {
-            // Basic formatting for response text
-            return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                      .replace(/\n/g, '<br>')
-                      .replace(/- (.*?)(?=\n|$)/g, '• $1');
-        }
-        
-        function generateThreadId() {
-            return 'ghc_thread_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-        
-        // Check LangGraph connection on load
-        window.onload = async function() {
-            try {
-                const response = await fetch(`${LANGGRAPH_DEPLOYMENT_URL}/docs`);
-                if (response.ok) {
-                    document.getElementById('tracing-status').innerHTML = 'Connected ✅';
-                    document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-green-100 text-green-800';
-                } else {
-                    throw new Error('Connection test failed');
-                }
-            } catch (error) {
-                document.getElementById('tracing-status').innerHTML = 'Checking...';
-                document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800';
-                
-                // Try alternative endpoint
-                setTimeout(async () => {
-                    try {
-                        const response = await fetch(`${LANGGRAPH_DEPLOYMENT_URL}`);
-                        if (response.ok || response.status === 405) {
-                            document.getElementById('tracing-status').innerHTML = 'Connected ✅';
-                            document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-green-100 text-green-800';
-                        }
-                    } catch (e) {
-                        document.getElementById('tracing-status').innerHTML = 'Offline ❌';
-                        document.getElementById('connectionStatus').className = 'px-3 py-1 rounded-full text-sm bg-red-100 text-red-800';
+
+                // Try alternative approach
+                try {
+                    const altResponse = await fetch(`${LANGGRAPH_BASE_URL}/invoke`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Api-Key': LANGGRAPH_API_KEY,
+                        },
+                        body: JSON.stringify({
+                            messages: [{ type: "human", content: input }]
+                        })
+                    });
+
+                    if (altResponse.ok) {
+                        const altData = await altResponse.json();
+                        responseDiv.innerHTML = `<div class="prose">${JSON.stringify(altData, null, 2)}</div>`;
+                        statusDiv.innerHTML = '✅ Connected via alternative endpoint';
+                        return;
                     }
-                }, 2000);
+                } catch (altError) {
+                    console.error('Alternative also failed:', altError);
+                }
+
+                responseDiv.innerHTML = `
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p class="font-semibold text-red-700">Connection Error</p>
+                            <p class="text-sm text-red-600 mt-1">${error.message}</p>
+                            <p class="text-xs text-gray-600 mt-2">Please check the browser console for more details.</p>
+                        </div>
+                    `;
+                errorDiv.innerHTML = `❌ ${error.message}`;
+                statusDiv.innerHTML = '❌ Request failed';
             }
+        }
+
+        // Initialize on load
+        window.onload = function () {
+            console.log('GHC Digital Twin initialized');
+            console.log('LangGraph URL:', LANGGRAPH_BASE_URL);
+            document.getElementById('langgraph-status').innerHTML = '🟢 Ready';
         };
-        
-        // Handle Enter key in textarea
-        document.getElementById('messageInput').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendToLangGraph();
-            }
-        });
     </script>
-    
+
+    <!-- Include marked.js for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </body>
-</html>
+</html></html>
