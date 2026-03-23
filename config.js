@@ -3,8 +3,8 @@ const LANGGRAPH_CONFIG = {
     // Your live deployment URL
     deployment_url: 'https://dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app',
     
-    // API Key for authentication
-    api_key: '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',
+    // API Key - set via environment variable, never hardcode in production
+    api_key: (typeof process !== 'undefined' && process.env && process.env.DR_API_KEY) || '',
     
     // Assistant IDs from your deployment
     assistants: {

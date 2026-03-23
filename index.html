@@ -103,17 +103,79 @@
     </div>
 
     <script>
-        // LangGraph Configuration - FIXED WITH CORRECT ASSISTANT ID
-        const ASSISTANT_ID = '4cc9f4b5-6725-5394-98ba-5f55b15cd94f';
-        const LANGGRAPH_BASE_URL = 'https://dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app';
-        const LANGGRAPH_API_KEY = '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';
+        // LangGraph Configuration
+        const LANGGRAPH_BASE_URL = window.LANGGRAPH_BASE_URL || 'http://localhost:8000';
 
         let currentAgent = 'ceo_digital_twin';
         let currentThreadId = null;
 
-        // Create a thread for the session
-        async function createThread() {
+        function selectAgent(agentType) {
+            currentAgent = agentType;
+            // Update UI
+            document.querySelectorAll('.agent-card').forEach(card => card.classList.remove('selected', 'ring-2', 'ring-blue-500'));
+            const card = document.getElementById('agent-' + agentType.split('_')[0]);
+            if (card) card.classList.add('selected', 'ring-2', 'ring-blue-500');
+            document.getElementById('selected-agent').textContent =
+                card ? card.querySelector('.font-semibold').textContent : agentType;
+        }
+
+        async function sendToLangGraph() {
+            const input = document.getElementById('user-input');
+            const responseDiv = document.getElementById('response');
+            const statusDiv = document.getElementById('langgraph-status');
+            const errorDiv = document.getElementById('error-details');
+            const question = input.value.trim();
+
+            if (!question) return;
+
+            responseDiv.innerHTML = '<p class="text-gray-500 animate-pulse">Consulting AI Executive...</p>';
+            statusDiv.textContent = 'Processing...';
+            errorDiv.textContent = '';
+
             try {
-                const response = await fetch(`${LANGGRAPH_BASE_URL}/threads`, {
+                const response = await fetch(`${LANGGRAPH_BASE_URL}/api/chat`, {
                     method: 'POST',
-                    headers:
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        question: question,
+                        agent_type: currentAgent,
+                        audience: 'public'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const answer = data.response || data.answer || JSON.stringify(data, null, 2);
+
+                responseDiv.innerHTML = `
+                    <div class="prose max-w-none">
+                        <div class="text-sm text-gray-500 mb-2">Agent: ${data.agent_type || currentAgent} | Confidence: ${(data.confidence || 0.85) * 100}%</div>
+                        <div class="whitespace-pre-wrap">${answer}</div>
+                        ${data.recommended_actions ? `
+                        <div class="mt-4 pt-4 border-t">
+                            <h4 class="font-semibold text-sm">Recommended Actions:</h4>
+                            <ul class="list-disc list-inside text-sm">${data.recommended_actions.map(a => `<li>${a}</li>`).join('')}</ul>
+                        </div>` : ''}
+                    </div>`;
+
+                statusDiv.textContent = `Response received at ${new Date().toLocaleTimeString()}`;
+                input.value = '';
+            } catch (err) {
+                responseDiv.innerHTML = `<p class="text-red-500">Error: ${err.message}</p>`;
+                errorDiv.textContent = err.message;
+                statusDiv.textContent = 'Error occurred';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            selectAgent('ceo_digital_twin');
+            document.getElementById('current-thread').textContent = 'session_' + Date.now();
+            document.getElementById('connection-status').textContent = 'Connected';
+        });
+    </script>
+</body>
+</html>

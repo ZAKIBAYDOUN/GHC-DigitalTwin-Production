@@ -27,7 +27,7 @@ class AgentState(TypedDict):
 
 # LangGraph Cloud Configuration - Using your REAL credentials!
 DR_BASE_URL = os.getenv("DR_BASE_URL", "https://digitalroots-bf3899aefd705f6789c2466e0c9b974d.us.langgraph.app")
-DR_API_KEY = os.getenv("DR_API_KEY", "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")
+DR_API_KEY = os.getenv("DR_API_KEY", "")
 LANGGRAPH_DEPLOYMENT_URL = os.getenv("LANGGRAPH_DEPLOYMENT_URL", "https://dgt-1bf5f8c56c9c5dcd9516a1ba62c5ebf1.us.langgraph.app")
 DEPLOYMENT_ID = os.getenv("DEPLOYMENT_ID", "4d951c07-a841-4fb9-84b7-7816797416b9")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -138,13 +138,13 @@ ENHANCED_RESPONSES = {
 As CEO Digital Twin, I provide strategic oversight for our sustainable agriculture operations:
 
 **Current Performance (Q3 2024):**
-- Revenue: €3.2M with 32% YoY growth
+- Revenue: EUR 3.2M with 32% YoY growth
 - EBITDA Margin: 22% and improving
 - Operations: 750 hectares across Gran Canaria & Tenerife
 - Team: 180 employees including 45 engineers
 
 **Strategic Priorities:**
-- Series A funding target: €8M for technology expansion
+- Series A funding target: EUR 8M for technology expansion
 - Market expansion to mainland Spain and North Africa
 - Carbon-neutral operations (achieved Q4 2024)
 - Precision agriculture technology integration
@@ -156,9 +156,9 @@ Our focus remains on sustainable growth and operational excellence.""",
 From a CEO perspective on financial performance:
 
 **Key Metrics:**
-- Q3 2024 Revenue: €3.2M (32% YoY growth)
+- Q3 2024 Revenue: EUR 3.2M (32% YoY growth)
 - Operating cash flow positive since Q2 2024
-- Series A funding target: €8M for expansion
+- Series A funding target: EUR 8M for expansion
 - Strong EBITDA margins supporting growth
 
 **Financial Strategy:**

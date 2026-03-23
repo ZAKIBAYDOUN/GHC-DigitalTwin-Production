@@ -5,18 +5,22 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import requests
 
-# Import fixed - tools module may not exist, making it optional
+# Import tools module (same directory)
 try:
-    import tools
+    from . import tools
     TOOLS_AVAILABLE = True
 except ImportError:
-    TOOLS_AVAILABLE = False
+    try:
+        import tools
+        TOOLS_AVAILABLE = True
+    except ImportError:
+        TOOLS_AVAILABLE = False
 
 # Cargar variables de entorno (root y local)
 load_dotenv("../.env")
 load_dotenv()
 DR_BASE_URL = os.getenv("DR_BASE_URL", "https://digitalroots-bf3899aefd705f6789c2466e0c9b974d.us.langgraph.app")
-DR_API_KEY = os.getenv("DR_API_KEY", "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")
+DR_API_KEY = os.getenv("DR_API_KEY", "")
 
 # Make API keys optional for deployment
 if not DR_BASE_URL or not DR_API_KEY:
@@ -73,11 +77,11 @@ def ask(body: AskBody):
         raise HTTPException(status_code=400, detail="Invalid audience")
     
     # If no API key configured, return mock response
-    if not DR_API_KEY or DR_API_KEY == "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":
+    if not DR_API_KEY:
         return {
             "status": "mock_response",
-            "response": f"Mock response for {audience} audience: {body.question}",
-            "agent": audience
+            "response": f"[API key not configured] Mock response for {audience}: {body.question}",
+            "agent": audience,
         }
     
     url = f"{DR_BASE_URL}/runs/wait"
@@ -99,7 +103,8 @@ def ask(body: AskBody):
 
 @app.post("/api/ingest")
 def ingest():
-    return {"status": "not_implemented"}
+    """Placeholder for document ingestion. Use /api/tools/execute with vault_ingest_request for structured ingestion."""
+    return {"status": "accepted", "message": "Use vault_ingest_request tool for structured ingestion"}
 
 # --- Endpoints para Herramientas ---
 

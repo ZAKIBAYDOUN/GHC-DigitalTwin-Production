@@ -1,16 +1,16 @@
 # Netlify Configuration for GHC Digital Twin
 
 [build]
+  base = "frontend"
   command = "npm run build"
-  publish = "frontend/.next"
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api"
-  status = 200
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "18"
 
-[functions]
-  node_bundler = "nft"
+# API calls are proxied to the backend service
+[[redirects]]
+  from = "/api/*"
+  to = "https://ghc-digital-twin.onrender.com/api/:splat"
+  status = 200
+  force = true
